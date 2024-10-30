@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Filter</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script>
+        function updateStreams(classId) {
+            const streamSelect = document.getElementById('id_class_stream');
+            streamSelect.innerHTML = ''; // Clear existing options
+
+            if (classId) {
+                fetch(`/get_streams/${classId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.streams.forEach(stream => {
+                            const option = document.createElement('option');
+                            option.value = stream.id;
+                            option.text = stream.name;
+                            streamSelect.appendChild(option);
+                        });
+                    });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const classSelect = document.getElementById('id_student_class');
+            if (classSelect) {
+                classSelect.addEventListener('change', function() {
+                    updateStreams(this.value);
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Filter Students</h1>
+    <form method="get">
+        {{ filter.form.as_p }}
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Filtered Students</h2>
+    <ul>
+        {% for student in filter.qs %}
+            <li>{{ student.name }}</li>
+        {% empty %}
+            <li>No students found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

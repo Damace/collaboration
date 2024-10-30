@@ -1,0 +1,16 @@
+{# templates/admin/multi_select_filter.html #}
+<div class="filter">
+    <h3>{{ title }}</h3>
+    <ul>
+        {% for lookup, title in choices %}
+            <li>
+                <label>
+                    <input type="checkbox" name="{{ field.name }}" value="{{ lookup }}"
+                           {% if lookup in spec.value %}checked{% endif %} />
+                    {{ title }}
+                </label>
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="submit">Apply Filter</button>
+</div>
