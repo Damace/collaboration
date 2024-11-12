@@ -1,0 +1,93 @@
+{% extends "admin/base_site.html" %}
+<!DOCTYPE html>
+{% load static %}
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/all.min.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style.css'%}">
+</head>
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple HTML Table</title>
+    <style>
+        table {
+
+            padding-right: 50%;
+            width: 50%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border:0px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+           
+        }
+        .merged {
+            text-align: center;
+            background-color: #e2e2e2;
+        }
+    </style>
+</head>
+<body>
+
+
+   
+
+
+<h3>Students Progress Report </h3>
+<table> 
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+
+    {% if error_message %}
+    <div class="alert alert-warning" role="alert" id="errorAlert">
+      {{ error_message }}
+    </div>
+    <script>
+      // Hide the alert after 2 seconds
+      setTimeout(function() {
+        const alert = document.getElementById("errorAlert");
+        if (alert) {
+          alert.style.display = "none";
+        }
+      }, 2000);
+    </script>
+  {% endif %}
+
+    <form method="post" class="forms-sample">
+      {% csrf_token %}
+
+ 
+    <tbody>
+        <tr>
+            <td style="float:right"><label for="academic_year">Enter Registration number<span style="color:red">*</span></label></td>
+            <td> <input type="text" name ="reg_number" class="form-control"></td>
+        </tr>
+
+        <tr>
+             <td></td>
+            <td style="float:right">  <button type="submit" class="btn btn-primary">Get Results</button></td>
+        </tr>
+    </tbody>
+  </form>
+</table>
+
+</body>
+</html>
+{% endblock %}

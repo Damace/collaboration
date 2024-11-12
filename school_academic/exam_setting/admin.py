@@ -35,3 +35,13 @@ class ExamsCategoryAdmin(admin.ModelAdmin):
 
 # Register the ExamsCategory model with the admin site
 admin.site.register(ExamsCategory, ExamsCategoryAdmin)
+
+
+from .models import SetExam    
+
+class SetExamAdmin(admin.ModelAdmin):
+    list_display = ('start_date', 'end_date', 'exam_category')
+    # Allow searching by short name and name
+admin.site.register(SetExam, SetExamAdmin)
+
+

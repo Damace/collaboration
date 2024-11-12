@@ -6,11 +6,23 @@ from .models import CustomUser, StudentProfile, TeacherProfile, AcademicProfile,
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     # list_display = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff')
+    
+        # Customize fieldsets
+    # fieldsets = (
+    
+    #     ('Permissions', {
+    #         'fields': ( 'is staff',),
+    #         'description': "Custom label for 'is_staff' will be applied."
+    #     }),
+       
+    # )
 
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(StudentProfile)
-admin.site.register(TeacherProfile)
-admin.site.register(AcademicProfile)
-admin.site.register(AdmissionProfile)
-admin.site.register(PrincipalProfile)
-admin.site.register(AdministratorProfile)
+# admin.site.register(StudentProfile)
+# admin.site.register(TeacherProfile)
+# admin.site.register(AcademicProfile)
+# admin.site.register(AdmissionProfile)
+# admin.site.register(PrincipalProfile)
+# admin.site.register(AdministratorProfile)
+
+

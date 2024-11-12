@@ -1,0 +1,135 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/all.min.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.cs'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style.css'%}">
+  <link rel="shortcut icon" href="http://www.urbanui.com/" />
+</head>
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+{% block content %}
+
+{% block branding %}
+    <div style="display: flex; align-items: center; gap: 20px;">
+      {% block extrahead %}
+        {{ block.super }}
+      {% endblock %}
+      
+    </div>
+{% endblock %}
+
+
+
+
+<form method="post">
+  {% csrf_token %}
+
+  <div>
+
+    <p style="padding-top:10px; padding-bottom:10px;"><strong>Add Subjects Results</strong></p>
+
+  
+  </div>
+  
+  <table style="width: 100%;" class="table table-striped">
+    <tr>
+      <th><input type="checkbox" id="select-all" onclick="toggleSelectAll(this)"></th>  {# Select All Checkbox #}
+      <th>Academic year</th>
+      <th>Term</th>
+      <th>Class</th>
+      <th>Registration Number</th>
+      <th>Full name</th> 
+      <th>Subject</th>
+      <th>Result</th>
+      <th>Grade</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+      <td><input type="checkbox" name="students" value="{{ student.id }}" class="student-checkbox" checked></td>
+
+      <td>
+        <select name="academicyears_{{ student.id }}" class="form-control">
+          {% for academicyears in academic_years %}
+            <option value="{{ academicyears.name }}">{{ academicyears.name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+
+      <td>
+        <select name="term_{{ student.id }}" class="form-control">
+          {% for term in terms %}
+            <option value="{{ term.name }}">{{ term.name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+
+      <td>
+        <select name="new_class_{{ student.id }}" class="form-control">
+          {% for class in classes %}
+          <option value="{{ class.class_name }}">{{ class.class_name}}</option>
+      {% endfor %}
+        </select>
+      </td>
+
+
+      
+
+     
+
+      
+      <td>{{ student.registration_number }}</td>
+      <td>{{ student.first_name }} {{ student.last_name }}</td>
+      
+      
+      <!-- Subject Dropdown -->
+      <td>
+        <select name="subject_{{ student.id }}" class="form-control">
+          {% for subject in subjects %}
+            <option value="{{ subject.subject_name }}">{{ subject.subject_name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+
+      <!-- Result Text Field -->
+      <td>
+        <input type="number" name="result_{{ student.id }}" placeholder="Enter result" min="0" required>
+      </td>
+
+      <!-- Grade Dropdown -->
+      <td>
+        <select name="grade_{{ student.id }}" class="form-control">
+          {% for grade in grades %}
+            <option value="{{ grade.grade_name }}">{{ grade.grade_name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6">No students selected.</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div align="left" style="padding: 2%;">
+    <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">Submit </button>
+  </div>
+</form>
+
+
+<script>
+  function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = source.checked;
+    });
+  }
+</script>
+
+{% endblock %}

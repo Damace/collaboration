@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+
+{% block branding %}
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">My Custom Admin</a></h1>
+{% endblock %}
+
+{% block usertools %}
+    {% if user.is_authenticated %}
+        <strong>Welcome, {{ user.get_username }}</strong> |
+        <a href="{% url 'admin_logout' %}">Log out</a>  <!-- Use custom logout URL here -->
+    {% else %}
+        <a href="{% url 'admin_login' %}">Log in</a>
+    {% endif %}
+{% endblock %}

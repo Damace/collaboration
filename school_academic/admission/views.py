@@ -1,8 +1,10 @@
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
 
+from results.models import Result
 
 from .models import Sponsor
+
 
 def sponsor_list(request):
     sponsors = Sponsor.objects.all()
@@ -192,3 +194,192 @@ def add_page_number(canvas, doc):
 
     # Draw the page number on the bottom center
     canvas.drawString(270, 10, page_number)
+
+
+
+
+############ DEMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO VIEW  
+
+
+# views.py
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+
+@staff_member_required  # Ensures only logged-in staff can access the view
+def custom_report(request):
+    context = {
+        'data': "This is your custom report data.",
+    }
+    return render(request, 'admin/custom_report.html', context)
+
+
+
+
+############ DEMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO VIEW  
+
+
+
+
+# views.py
+from django.http import JsonResponse
+from .models import StudentRegistration
+from django.db.models import Count 
+
+def registration_data(request):
+    # Example: Count registrations per class
+    data = StudentRegistration.objects.values('entry_class').annotate(count=Count('id'))
+    
+    classes = [item['entry_class'] for item in data]
+    counts = [item['count'] for item in data]
+
+    return JsonResponse({'classes': classes, 'counts': counts})
+
+# views.py
+# views.py
+from django.http import JsonResponse
+from django.db.models import Avg  # Import the Avg aggregation function
+from .models import StudentRegistration
+
+def second_chart_data(request):
+    # Example data for the second chart
+    data = StudentRegistration.objects.values('entry_class').annotate(average_score=Avg('entry_category'))  # Adjust 'score_field' to your actual field name
+    classes = [item['entry_class'] for item in data]
+    scores = [item['average_score'] for item in data]
+
+    return JsonResponse({'classes': classes, 'scores': scores})
+
+
+def results_data(request):
+    # Aggregate average scores per subject
+    data = Result.objects.values("subject").annotate(avg_score=Avg("total"))
+    subjects = [item["subject"] for item in data]
+    avg_scores = [item["avg_score"] for item in data]
+
+    return JsonResponse({
+        "subjects": subjects,
+        "avg_scores": avg_scores
+    })
+    
+    
+from django.shortcuts import render
+
+
+# views.py
+from django.shortcuts import render
+from .models import StudentRegistration
+
+def all_students(request):
+    students = StudentRegistration.objects.all()
+    context = {
+        'students': students,
+    }
+    return render(request, 'admin/filter_resultStudent.html', context)
+
+
+# views.py
+
+from django.shortcuts import render, redirect
+from Record_results.models import QueResults
+from django.shortcuts import redirect
+from django.contrib import messages
+
+
+def upgrade_students_view(request):
+    if request.method == 'POST':
+        # Get the selected criteria from the form
+        academic_year_new = request.POST.get('academic_year_new')
+        program_new = request.POST.get('programme_new')
+        term_new = request.POST.get('term_new')
+        class_new = request.POST.get('class_new')
+        stream = request.POST.get('stream_new')
+        
+     
+        # Process each selected student
+        selected_students = request.POST.getlist('selected_students')
+        for student_id in selected_students:
+        
+            student = StudentRegistration.objects.get(id=student_id)
+            if academic_year_new:
+                student.entry_year_id = academic_year_new
+            if program_new:
+                student.entry_programme_id = program_new
+            if term_new:
+                student.entry_term_id = term_new
+            if class_new:
+                student.entry_class_id = class_new
+            if stream:
+                student.stream_name_id = stream
+            student.save()
+            
+            messages.success(request, "Upgraded successfully!")
+        return redirect('admin:index')  # Redirect to the admin homepage 
+
+    return render(request, 'addresults.html', {'filtered_students': ''})
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+from django.http import HttpResponse
+from django.shortcuts import render
+from io import BytesIO
+import base64
+
+def registration_bar_graph(request):
+    # Query all students
+    students = StudentRegistration.objects.all()
+    
+    # Extract registration numbers and names
+    registration_numbers = [student.registration_number for student in students]
+    names = [f"{student.first_name} {student.last_name}" for student in students]
+
+    # Create a bar graph
+    plt.figure(figsize=(10, 6))
+    y_pos = np.arange(len(registration_numbers))
+    plt.barh(y_pos, registration_numbers, align='center')
+    plt.yticks(y_pos, names)
+    plt.xlabel('Registration Number')
+    plt.title('Student Registration Numbers')
+
+    # Save the plot to a BytesIO object
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    
+    # Encode the image in base64
+    image_png = buf.getvalue()
+    graph = base64.b64encode(image_png).decode('utf-8')
+    plt.close()
+
+    return render(request, 'admin/index.html', {'graph': graph})
+
+
+import matplotlib.pyplot as plt
+import io
+import urllib, base64
+from django.shortcuts import render
+from .models import StudentRegistration
+from admission import models
+
+def student_count_bar_chart(request):
+    # Aggregate data: Count students by entry_class
+    data = StudentRegistration.objects.values('entry_class').annotate(count=models.Count('id'))
+    classes = [item['entry_class'] for item in data]
+    counts = [item['count'] for item in data]
+
+    # Generate bar chart
+    plt.figure(figsize=(10, 6))
+    plt.bar(classes, counts, color='skyblue')
+    plt.xlabel('Class')
+    plt.ylabel('Number of Registered Students')
+    plt.title('Number of Registered Students per Class')
+    plt.xticks(rotation=45)
+
+    # Save chart to a bytes buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = 'data:image/png;base64,' + urllib.parse.quote(string)
+    plt.close()  # Close the plot to free memory
+
+    return render(request, 'student_chart.html', {'data': uri})

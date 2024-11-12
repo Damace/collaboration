@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>KondoaGirls High</title>
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/all.min.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.cs'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style.css'%}">
+  <link rel="shortcut icon" href="http://www.urbanui.com/" />
+</head> 
+<body>
+
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
+        <div class="row flex-grow">
+
+
+          <div class="col-lg-6 login-half-bg d-flex flex-row">
+            <p class="text-white font-weight-medium text-center flex-grow align-self-end">Copyright &copy; 2024  All rights reserved.</p>
+          </div>
+
+          <div class="col-lg-6 d-flex align-items-center justify-content-center">
+            <div class="auth-form-transparent text-left p-3">
+              
+              <h4 class="class1">Login</h4>
+
+
+              <div><small class="font-weight-light"><b style="color:rgb(172, 29, 29)"><strong>Get Login Credential from your System Administrator.</strong></b></small></div>
+              <p></p>
+           
+
+             
+            {% if form.errors %}
+
+            <li class="alert alert-danger updated">Invalid login credentials. Please try again.</li>
+
+              {% endif %}
+
+         
+             <form method="post" action="{% url 'custom_admin_login' %}">
+               {% csrf_token %} 
+
+               <fieldset>
+               <div class="form-group">
+               <label for="exampleInputEmail">Username</label>
+               <div class="input-group">
+                 <div class="input-group-prepend bg-transparent">
+                   <span class="input-group-text bg-transparent border-right-0">
+                     <i class="fa fa-user text-primary"></i>
+                   </span>
+                 </div>
+                 <input type="text" id="ccomment" name="username" class="form-control form-control-lg border-left-0" id="exampleInputEmail" >
+               </div>
+             </div>
+             <div class="form-group">
+               <label for="exampleInputPassword">Password</label>
+               <div class="input-group">
+                 <div class="input-group-prepend bg-transparent">
+                   <span class="input-group-text bg-transparent border-right-0">
+                     <i class="fa fa-lock text-primary"></i>
+                   </span>
+                 </div>
+                 <input type="password" id="ccomment" name="password" class="form-control form-control-lg border-left-0" id="exampleInputPassword">                        
+               </div>
+             </div>
+             <div class="my-2 d-flex justify-content-between align-items-center">
+               <div class="form-check">
+                 <label class="form-check-label text-muted">
+                   <input type="checkbox" class="form-check-input">
+                   Keep me signed in
+                 </label>
+               </div>
+               <a href="#" class="auth-link text-black"></a>
+             </div>
+             <div class="my-3">
+               <button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit">Login</button>
+              
+             </div>
+            
+            </fieldset>
+           </form>
+
+            </div>
+          </div>
+         
+        </div>
+      </div>
+      <!-- content-wrapper ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+
+
+
+
+
+
+
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+
+  <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'vendors/js/vendor.bundle.addons.js' %}"></script>
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/misc.js' %}"></script>
+  <script src="{% static 'js/settings.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <script src="{% static 'js/dashboard.js' %}"></script>
+
+  <script src="{% static 'js/form-validation.js' %}"></script>
+  <script src="{% static 'js/bt-maxLength.js' %}"></script>
+
+
+
+  <!-- endinject -->
+</body>
+
+
+<!-- Mirrored from www.urbanui.com/melody/template/pages/samples/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Sep 2018 06:08:53 GMT -->
+</html>

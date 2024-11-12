@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <div align="center">
+    <h1>KONDOA GIRLS SECONDARY SCHOOL</h1>
+    <h2>P.O BOX 713448417 DODOMA</h2>
+    <h3>kondoagirls@gmail.com</h3>
+
+    <h2>Exam: {{ examination_result.exam_category }} - {{ examination_result.start_date }}</h2>   
+
+  </div>
+  <hr style="width: 75%; border: 6px solid #333; margin-bottom: 0px 0;">
+  <hr style="width: 75%; border: 2px solid #333; margin-top: 0px 0;">
+
+
+  <!-- Results Summary Table -->
+  <h3>Results Summary</h3>
+
+  <style>
+    .centered {
+        padding-top:0.5;
+        text-align: center;  /* Center horizontally */
+        vertical-align: middle;  /* Center vertically (if needed) */
+    }
+</style>
+
+<table border="1" width="50%">
+    <tr>
+        <th class="centered">I</th>
+        <th class="centered">II</th>
+        <th class="centered">III</th>
+        <th class="centered">IV</th>
+        <th class="centered">0</th>
+        <th class="centered">INC</th>
+        <th class="centered">ABS</th>
+        <th class="centered">Total</th>
+    </tr>
+    <tr>
+        <td class="centered">{{ summary.I|default:"0" }}</td>
+        <td class="centered">{{ summary.II|default:"0" }}</td>
+        <td class="centered">{{ summary.III|default:"0" }}</td>
+        <td class="centered">{{ summary.IV|default:"0" }}</td>
+        <td class="centered">{{ summary.zero|default:"0" }}</td>
+        <td class="centered">{{ summary.INC|default:"0" }}</td>
+        <td class="centered">{{ summary.ABS|default:"0" }}</td>
+        <td class="centered">{{ summary.total|default:"0" }}</td>
+    </tr>
+</table>
+
+
+
+
+
+  <!-- Main Results Table -->
+  <h3>Results</h3>
+  <table border="1">
+    <tr>
+      <th class="centered">Acad Year</th>
+      <th class="centered">Term</th>
+      <th class="centered">Reg Number</th>
+      <th class="centered">Full Name</th>
+      <th class="centered">Class </th>
+      <th class="centered">Subject</th>
+      <th class="centered">Total</th>
+      <th class="centered">Average</th>
+      <th class="centered">Grade</th>
+      <th class="centered">Point</th>
+      <th class="centered">Division</th>
+      <th class="centered">Position</th>
+      <th class="centered">Remack</th>
+     
+    </tr>
+    {% for result in results %}
+    <tr>
+      <td>{{ result.academic_year }}</td>
+      <td>{{ result.term }}</td>
+      <td>{{ result.registration_number }}</td> 
+      <td>{{ result.full_name }}</td>
+      <td>{{ result.class_name }}</td>
+      <td>{{ result.subject }}</td>
+      <td>{{ result.total }}</td>
+      <td>{{ result.avg }}</td>
+      <td>{{ result.grade }}</td>
+      <td>{{ result.point }}</td>
+      <td>{{ result.division }}</td>
+      <td>{{ result.comb_pos }}</td>
+     
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="13">No results found.</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

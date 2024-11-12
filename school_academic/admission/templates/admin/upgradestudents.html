@@ -1,0 +1,232 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+<div class="filter-section">
+    <form method="post">
+        {% csrf_token %}
+
+
+
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Table Example</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 0px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td style="float:right"><label for="academic_year">Academic Year:</label></td>
+            <td>
+                <select name="academic_year" id="academic_year" class="form-control">
+                    <option value="">All</option>
+                    {% for year in academic_years %}
+                        <option value="{{ year.id }}" {% if year.id|stringformat:"s" == request.POST.academic_year %}selected{% endif %}>
+                            {{ year.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><label for="programme">Programme:</label></td>
+            <td>
+                <select name="programme" id="programme" class="form-control">
+                    <option value="">All</option>
+                    {% for programme in programmes %}
+                        <option value="{{ programme.id }}" {% if programme.id|stringformat:"s" == request.POST.programme %}selected{% endif %}>
+                            {{ programme.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><label for="term">Term:</label></td>
+            <td>
+                <select name="term" id="term" class="form-control">
+                    <option value="">All</option>
+                    {% for term in terms %}
+                        <option value="{{ term.id }}" {% if term.id|stringformat:"s" == request.POST.term %}selected{% endif %}>
+                            {{ term.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><label for="class">Class:</label></td>
+            <td>
+                <select name="class" id="class" class="form-control">
+                    <option value="">All</option>
+                    {% for class in classes %}
+                        <option value="{{ class.id }}" {% if class.id|stringformat:"s" == request.POST.class %}selected{% endif %}>
+                            {{ class.class_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><label for="stream">Stream:</label></td>
+            <td>
+                <select name="stream" id="stream" class="form-control">
+                    <option value="">All</option>
+                    {% for stream in streams %}
+                        <option value="{{ stream.id }}" {% if stream.id|stringformat:"s" == request.POST.stream %}selected{% endif %}>
+                            {{ stream.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <trwidth = "50%">
+            <td colspan="10" >
+                <button type="submit" class="btn btn-info form-control">Filter</button>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
+
+    </form>
+</div>
+
+{% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+{% endif %}
+
+<h3>Student List</h3>
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#updateModal">Upgrade Selected Students</button>
+
+<form method="post">  <!-- Adjust action URL based on your URL configuration -->
+   
+    {% comment %} <form method="post" action="{% url 'upgrade_students' %}">  {% endcomment %}
+   
+    {% csrf_token %}
+
+
+      <!-- Modal for Updating Details -->
+      <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="updateModalLabel">Update Student based on the following Crieterials</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label for="academic_year">Academic Year:</label>
+                        <select name="academic_year_new" id="academic_year" class="form-control">
+                            <option value="">Select Academic Year</option>
+                            {% for year in academic_years %}
+                            <option value="{{ year.id }}">{{ year.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="programme">Programme:</label>
+                        <select name="programme_new" id="programme" class="form-control">
+                            <option value="">Select Programme</option>
+                            {% for programme in programmes %}
+                            <option value="{{ programme.id }}">{{ programme.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="term">Term:</label>
+                        <select name="term_new" id="term" class="form-control">
+                            <option value="">Select Term</option>
+                            {% for term in terms %}
+                            <option value="{{ term.id }}">{{ term.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="class">Class:</label>
+                        <select name="class_new" id="class" class="form-control">
+                            <option value="">Select Class</option>
+                            {% for class in classes %}
+                            <option value="{{ class.id }}">{{ class.class_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="stream">Stream:</label>
+                        <select name="stream_new" id="stream" class="form-control">
+                            <option value="">Select Stream</option>
+                            {% for stream in streams %}
+                            <option value="{{ stream.id }}">{{ stream.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-info">Submit</button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+    <table border="0">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select_all" /></th>
+                <th>Select all</th>
+                <th>Registration Number</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in filtered_students %}
+            <tr>
+                <td>
+                    <td>
+                        <input type="checkbox" name="selected_students" value="{{ student.id }}" checked class="select-student" />
+                        <input type="hidden" name="student_registration_number_{{ student.id }}" value="{{ student.registration_number }}">
+                        <input type="hidden" name="student_first_name_{{ student.id }}" value="{{ student.first_name }}">
+                        <input type="hidden" name="student_last_name_{{ student.id }}" value="{{ student.last_name }}">
+                      </td>
+                </td>
+                <td>{{ student.registration_number }}</td>
+                <td>{{ student.first_name }}</td>
+                <td>{{ student.last_name }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+  
+</form>
+
+<script>
+    // JavaScript to handle the select all checkbox
+    document.getElementById('select_all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="student_ids"]');
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = this.checked;
+        });
+    });
+</script>
+{% endblock %}

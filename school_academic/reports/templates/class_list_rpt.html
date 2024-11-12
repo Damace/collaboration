@@ -1,0 +1,82 @@
+<!-- templates/report_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .report-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .report-details {
+            margin: 0 auto;
+            width: 80%;
+            border-collapse: collapse;
+        }
+        .report-details th, .report-details td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .report-details th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .section-title {
+            font-size: 20px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Report Header -->
+    <div class="header">
+        <h1>{{ school_name }}</h1>
+        <p>Report Generated on {{ generation_date }}</p>
+    </div>
+
+    <!-- Report Title -->
+    <div class="report-title">{{ report_title }}</div>
+
+    <!-- Student Information Section -->
+    <div>
+        <p><strong>Student Name:</strong> {{ student.full_name }}</p>
+        <p><strong>Class:</strong> {{ student.student_class }}</p>
+        <p><strong>Admission Number:</strong> {{ student.admission_number }}</p>
+    </div>
+
+    <!-- Performance Table -->
+    <div class="section-title">Subject Performance</div>
+    <table class="report-details">
+        <tr>
+            <th>Subject</th>
+            <th>Marks Obtained</th>
+            <th>Grade</th>
+            <th>Comments</th>
+        </tr>
+        {% for subject in subjects %}
+        <tr>
+            <td>{{ subject.name }}</td>
+            <td>{{ subject.marks }}</td>
+            <td>{{ subject.grade }}</td>
+            <td>{{ subject.comments }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>Prepared by {{ prepared_by }}</p>
+        <p>School Management System</p>
+    </div>
+</body>
+</html>

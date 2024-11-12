@@ -1,0 +1,11 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Custom Report</h1>
+    <p>{{ data }}</p>
+{% endblock %}
+
+{% block object-tools %}
+    {{ block.super }}
+    <a href="{{ custom_report_url }}" class="button" style="margin-left: 10px;">Custom Report</a>
+{% endblock %}

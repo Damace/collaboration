@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+  <!-- Custom button at the top left -->
+  <div style="margin-bottom: 20px;">
+      <a href="{% url 'admin:promote-students' %}" class="button">Promote Students</a>
+  </div>
+  
+  {{ block.super }}  {# This keeps the rest of the content intact #}
+{% endblock %}

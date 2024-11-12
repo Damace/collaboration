@@ -1,0 +1,39 @@
+/* Custom styles for Django admin */
+.site-header h1 {
+    font-family: 'Arial', sans-serif; /* Change this to your desired font */
+    font-size: 24px; /* Adjust font size as needed */
+    font-weight: bold; /* Change to desired weight */
+    color: #4A4A4A; /* Change to desired color */
+}
+
+body {
+    background-color: #f4f6f9;
+}
+.my-branding {
+    font-size: 24px;
+    color: #333;
+}
+
+.custom-home-btn {
+    padding: 5px 15px;
+    font-size: 14px;
+    color: white;
+    background-color: #007bff;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.custom-home-btn:hover {
+    background-color: #0056b3;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Space between rows */
+}
+
+.col {
+    flex: 1;
+    padding: 5px;
+}

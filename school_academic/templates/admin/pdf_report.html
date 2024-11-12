@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    {% if students %}
+        <table>
+            <tr>
+                <th>Student</th>
+                <th>Stream</th>
+                <th>Subjects</th>
+            </tr>
+            {% for student in students %}
+                <tr>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.stream.name }}</td>
+                    <td>
+                        {% for subject in subjects %}
+                            {{ subject.name }},
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No results found</p>
+    {% endif %}
+</body>
+</html>

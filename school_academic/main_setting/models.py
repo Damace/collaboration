@@ -7,11 +7,13 @@ class Department(models.Model):
     def __str__(self):
         return self.name
     
-class Programme(models.Model):
-    name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
+
+
+
+
+from django.db import models
+from django.utils import timezone
 
 class Subject(models.Model):
     CORE = 'Core'
@@ -28,15 +30,22 @@ class Subject(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=CORE)  # New field added
 
     def __str__(self):
-        return f"{self.subject_name} ({self.get_status_display()})"
+        return f"{self.subject_code} - {self.subject_name} ({self.get_status_display()})"
 
+
+class Programme(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+    
 
 from django.db import models
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
 class Class(models.Model):
-    programme = models.CharField(max_length=100)
+    programme = models.ForeignKey(Programme, on_delete=models.CASCADE)
     class_name = models.CharField(max_length=100)
     no_of_stream = models.PositiveIntegerField(default=0, editable=False)
     assigned_streams = models.ManyToManyField('Stream', related_name='classes', blank=True)
@@ -116,6 +125,7 @@ from django.db import models
 class Stream(models.Model):
     name = models.CharField(max_length=10)
 
+
     def __str__(self):
         return self.name
     
@@ -133,18 +143,19 @@ class SubjectAllocation(models.Model):
         ('active', 'Active'),
         ('inactive', 'Inactive'),
     ]
+    
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
     term = models.ForeignKey(Term, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     class_name = models.ForeignKey(Class, on_delete=models.CASCADE)  # Assuming Class is defined in the same or another app
     teacher = models.ForeignKey(TeacherProfile, on_delete=models.CASCADE)  # Foreign key to TeacherProfile
-    phone_number = models.CharField(max_length=15)  # Optional, if needed
+    phone_number = models.CharField(max_length=15, blank=True, null=True)  # Optional, if needed
     assigned_date = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=8, choices=STATUS_CHOICES, default='active')
 
     def __str__(self):
-        return f'{self.subject} assigned to {self.class_name} for {self.academic_year}'
-
+        # Joining subject_code and subject_name from the related Subject model
+        return f'{self.subject.subject_code} - {self.subject.subject_name} assigned to {self.class_name} for {self.academic_year}'
 
 # systemUsers/models.py
 from django.db import models
@@ -160,15 +171,27 @@ class ResultsDeadline(models.Model):
 
     # systemUsers/models.py
 from django.db import models
-class Publish(models.Model):
-    ACTION_CHOICES = [
-        ('publish', 'Publish'),
-        ('unpublish', 'Unpublish'),
-    ]
 
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+class Publish(models.Model):
     program_name = models.ForeignKey(Programme, on_delete=models.CASCADE)  # ForeignKey to Programme
-    action = models.CharField(max_length=10, choices=ACTION_CHOICES, default='unpublish')  # Action field with choices
+  
+    def __str__(self):
+        return f'{self.program_name}'
+
+   
+      
+
+
+
+from django.db import models
+
+class Contact(models.Model):
+    phone_number = models.CharField(max_length=15)  # Phone number with max length, adjust as needed
+    email = models.EmailField(unique=True)  # Unique email field
+    address = models.CharField(max_length=255)  # Address with max length
 
     def __str__(self):
-        return f'{self.program_name} - {self.get_action_display()}'
-
+        return f"{self.email} - {self.phone_number}"

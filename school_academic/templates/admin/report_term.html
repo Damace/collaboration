@@ -1,0 +1,81 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Annual Results Report</title>
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+</head>
+<body>
+
+{% block content %}
+<div class="container mt-5">
+  <div class="col-12 grid-margin stretch-card">
+    <div class="card">
+      <header class="card-header text-center">
+        <h4 class="card-title"><small><strong>Term Report</strong></small></h4>
+      </header>
+      <div class="card-body">
+        
+        {% if error_message %}
+          <div class="alert alert-warning" role="alert" id="errorAlert">
+            {{ error_message }}
+          </div>
+          <script>
+            // Hide the alert after 2 seconds
+            setTimeout(function() {
+              const alert = document.getElementById("errorAlert");
+              if (alert) {
+                alert.style.display = "none";
+              }
+            }, 2000);
+          </script>
+        {% endif %}
+        
+        <form method="post" class="forms-sample mt-4">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="academic_year_name">Academic Year <span class="text-danger">*</span></label>
+            <select name="academic_year" id="academic_year_name" class="form-control" required>
+              <option value="0">-- Select --</option>
+              {% for year in academic_year %}
+                <option value="{{ year.name }}">{{ year.name }}</option>
+              {% empty %}
+                <option disabled>No academic years available</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="academic_year_name">Term <span class="text-danger">*</span></label>
+            <select name="academic_term" id="academic_year_name" class="form-control" required>
+              <option value="0">-- Select --</option>
+              {% for term in terms %}
+                <option value="{{ term.name }}">{{ term.name }}</option>
+              {% empty %}
+                <option disabled>No academic years available</option>
+              {% endfor %}
+            </select>
+          </div>
+
+
+          
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Get report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Melody Admin</title>
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/all.min.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.cs'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style.css'%}">
+  <link rel="shortcut icon" href="http://www.urbanui.com/" />
+</head> 
+
+
+
+{% block content %}
+  <form method="get" action="">
+    <label for="academic_year">Academic Year:</label>
+    <select id="academic_year" name="academic_year" class="form-control form-control-lg border-left-0">
+      {% for year in academic_years %}
+        <option value="{{ year.name }}">{{ year.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="term">Term:</label>
+    <select id="term" name="term">
+      {% for term in terms %}
+        <option value="{{ term.id }}">{{ term.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="class">Class:</label>
+    <select id="class" name="class">
+      {% for class in classes %}
+        <option value="{{ class.id }}">{{ class.class_name }}</option>
+      {% endfor %}
+    </select> 
+
+    <button type="submit" name="generate_pdf" value="true">Generate PDF Report</button>
+    <button type="submit">View Report</button>
+  </form>
+
+  {% if students %}
+    <h2>Class List Report</h2>
+    <table>
+      <tr>
+        <th>Student</th>
+        <th>Stream</th>
+        <th>Subjects</th>
+      </tr>
+      {% for student in students %}
+        <tr>
+          <td>{{ student.name }}</td>
+          <td>{{ student.stream.name }}</td>
+          <td>
+            {% for subject in subjects %}
+              {{ subject.name }},
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>No results found</p>
+  {% endif %}
+{% endblock %}
