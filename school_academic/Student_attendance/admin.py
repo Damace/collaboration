@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RecordAttendanceProxy
+from .models import RecordAttendanceProxy, StudentsAttendance
 
 
 from .models import AbsentReason
@@ -19,7 +19,7 @@ class RecordAttendanceProxyAdmin(admin.ModelAdmin):
         pass
 
 # Register the proxy model and admin class
-admin.site.register(RecordAttendanceProxy, RecordAttendanceProxyAdmin)
+# admin.site.register(RecordAttendanceProxy, RecordAttendanceProxyAdmin)
 
 
 from django.contrib import admin
@@ -35,3 +35,20 @@ class StudentAssignmentAdmin(admin.ModelAdmin):
     date_hierarchy = 'deadline_date'
 
 admin.site.register(StudentAssignment, StudentAssignmentAdmin)
+
+
+# admin.py
+
+from django.contrib import admin
+
+
+class StudentsAttendanceAdmin(admin.ModelAdmin):
+    list_display = ('student', 'attendance_status', 'reason', 'date')
+    list_editable = ('attendance_status', 'reason')
+    list_per_page = 20
+
+    # Optional: Filters for student and attendance status
+    list_filter = ('attendance_status', 'date')
+    search_fields = ('student__first_name', 'student__last_name', 'student__registration_number')
+
+admin.site.register(StudentsAttendance, StudentsAttendanceAdmin)

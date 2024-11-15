@@ -17,12 +17,12 @@
         /* Header styles */
         .header {
             display: flex;
-            align-items: center; /* Align items vertically */
-            
-            
+            justify-content: space-between;
+            align-items: center; /* Center items vertically */
+            margin-bottom: 0px; /* Space between header and image */
         }
 
-        h1 {
+        h2 {
             color: #1c1d1c;
             margin: 0; /* Remove default margin */
             text-align: center; /* Center title */
@@ -31,7 +31,6 @@
 
         .contacts {
             text-align: center; /* Center contacts */
-            
         }
 
         /* Table styling */
@@ -81,97 +80,130 @@
 </head>
 <body>
     <div class="header">
-
         {% load static %}
-        <img src="{{ logo_url }}" alt="" style="height: 100px;">
-        <h2>KONDOA GIRLS SECONDARY SCHOOL <br><small>P.O Box 193 Kondoa | Phone: (255) 713448417</small></h2><img src="{{ profile_image }}" alt="" style="height: 120px;">
-       
+        <img src="{{ logo_url }}" alt="School Logo" style="height: 100px;">
+        <h2  style="padding-left: 10px;">KONDOA GIRLS SECONDARY SCHOOL <br><small>P.O Box 193 Kondoa | Phone: (255) 713448417</small><br>
+            <small>Email:kondoagirls@gmail.com</small></h1>
+        <img src="{{ profile_image }}" alt="Profile Image" style="height: 80px;">
     </div>
+    <h2><small>STUDENTS PROGRESS REPORT</small></h2>
+    <hr style="margin: 0 10px;">
+    <hr style="margin: 0 10px;">
 
-    <div style="display: flex; justify-content: space-between; width: 100%;">
-       
-    </div>
-    <hr style="flex-grow: 10; margin: 0 10px;width=100%">
-    <hr style="flex-grow: 20; margin: 0 10px;width=100%">
-    
+
+
+
+    {% for student in filtered_students2 %}
+    <tr>
+        <td>{{ student.registration_number }}</td>
+        <td>{{ student.first_name }} {{ student.last_name }}</td>
+        <td>
+            {% if student.profile_picture %}
+                <img src="{{ student.profile_picture.url }}" alt="Profile Picture" style="width: 100px; height: auto;">
+            {% else %}
+                No Image
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+
+
+    <h3 align="left">Academic year: {{ academic_year }} &nbsp&nbsp &nbsp   Term: {{ term }}</h3>
     <table>
-        <thead>
-            <tr>
-                <th colspan="8" style="text-align:left;">Results Division Summary</th> <!-- Merged header -->
-            </tr>
-            <tr>
-                <th>I</th>
-                <th>II</th>
-                <th>III</th>
-                <th>IV</th>
-                <th>0</th>
-                <th>INC</th>
-                <th>ABS</th>
-            
-            </tr>
-        </thead>
-        <tbody>
-            {% comment %} {% for item in data2 %} {% endcomment %}
-            <tr>
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-                <td><small>1</small></td> 
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-
-                {% comment %} <td><small>{{ item.grade_I }}</small></td>
-                <td><small>{{ item.grade_II}}</small></td>
-                <td><small>{{ item.grade_III }}</small></td> 
-                <td><small>{{ item.grade_IV }}</small></td>
-                <td><small>{{ item.grade_0 }}</small></td>
-                <td><small>{{ item.incomplete }}</small></td>
-                <td><small>{{ item.absent }}</small></td> {% endcomment %}
-              
-            
-            </tr>
-            {% comment %} {% empty %} {% endcomment %}
-           
-            {% comment %} {% endfor %} {% endcomment %}
-        </tbody>
+        <tr>
+            <td><strong>Name:</strong> {{ student_details.name }}</td>
+            <td><strong>Registration No:</strong> {{ student_details.registration_no }}</td>
+            <td><strong>Sex:</strong> {{ student_details.sex }}</td>
+        </tr>
+        <tr>
+            <td><strong>Birth Date:</strong> {{ student_details.birth_date }}</td>
+            <td><strong>Admission Date:</strong> {{ student_details.admission_date }}</td>
+            <td><strong>Programme:</strong> {{ student_details.programme }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Class:</strong> {{ student_details.class_name }}</td>
+            <td></td>
+        </tr>
     </table>
-{% comment %} ##################################################################################################### {% endcomment %}
-
     <table>
         <thead>
             <tr>
-                <th colspan="8" style="text-align: left;">All Results</th> <!-- Merged header -->
-            </tr>
-            <tr>
-                <th>Index</th>
-                <th>Full Name</th>
-                <th class="subject">Subject</th> <!-- Added class for specific styling -->
-                 <th>Total</th>
-                 <th>Avg</th>
+                <th>S/N</th> 
+                <th>Subject name</th>
+                <th>Total Score</th>
+                  <th>Average</th>
+                  <th>Points</th>
                  <th>Grade</th>
-                 <th>Point</th>
                  <th>Division</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in data %}
+            {% for result in results %}
             <tr>
-                <td><small>{{ item.registration_number }}</small></td>
-                <td><small>{{ item.full_name }}</small></td>
-                <td><small>{{ item.subject }}</small></td> <!-- Added class for specific styling -->
-                <td><small>{{ item.total }}</small></td>
-                <td><small>{{ item.avg }}</small></td>
-                <td><small>{{ item.grade }}</small></td>
-                <td><small>{{ item.point }}</small></td>
-                <td><small>{{ item.division }}</small></td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center; color: red;">No data available.</td>
+                <td>{{ result.sn }}</td>
+                <td>{{ result.subject_name }}</td>
+                <td>{{ result.total }}</td>
+                <td>{{ result.average }}</td>
+                 <td>{{ result.remark }}</td>
+                <td>{{ result.grade }}</td>
+                 <td>{{ result.position }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    
+    
+    
+    <h3 align="left">Character Assessment</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>S/N</th>
+                <th>Item Name</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>HESHIMA</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>KUFAANYA KAZI KWA BIDII, JUHUDI NA MAARIFA</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>KUPENDA, KUTHAMINI NA KUELEWANA KAZI</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>KUSHIRIKI MICHEZO NA UTAMADUNI</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>KUTII KWA HIARI</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>UAMINIFU</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    
+
+    
+   
+    
+
+
+
 </body>
 </html>

@@ -138,6 +138,16 @@ from systemUsers.models import CustomUser, TeacherProfile  # Assuming your Teach
 from django.utils import timezone
 # from .models import AcademicYear, Term, Subject, Class, TeacherProfile
 
+class Teacher(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=15, unique=True)
+    username = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.username})"
+
+
 class SubjectAllocation(models.Model):
     STATUS_CHOICES = [
         ('active', 'Active'),
@@ -148,13 +158,12 @@ class SubjectAllocation(models.Model):
     term = models.ForeignKey(Term, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     class_name = models.ForeignKey(Class, on_delete=models.CASCADE)  # Assuming Class is defined in the same or another app
-    teacher = models.ForeignKey(TeacherProfile, on_delete=models.CASCADE)  # Foreign key to TeacherProfile
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)  # Foreign key to TeacherProfile
     phone_number = models.CharField(max_length=15, blank=True, null=True)  # Optional, if needed
     assigned_date = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=8, choices=STATUS_CHOICES, default='active')
 
     def __str__(self):
-        # Joining subject_code and subject_name from the related Subject model
         return f'{self.subject.subject_code} - {self.subject.subject_name} assigned to {self.class_name} for {self.academic_year}'
 
 # systemUsers/models.py
@@ -181,9 +190,6 @@ class Publish(models.Model):
     def __str__(self):
         return f'{self.program_name}'
 
-   
-      
-
 
 
 from django.db import models
@@ -195,3 +201,6 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.phone_number}"
+
+
+

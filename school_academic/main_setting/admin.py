@@ -119,7 +119,7 @@ class SubjectAllocationAdmin(admin.ModelAdmin):
     # Method to display teacher's full name in the admin list view
     @admin.display(description='Full Name')
     def teacher_full_name(self, obj):
-        return obj.teacher.full_name
+        return obj.teacher.first_name
     
     # Method to display teacher's phone number in the admin list view
     @admin.display(description='Phone Number')
@@ -571,3 +571,12 @@ class ContactAdmin(admin.ModelAdmin):
     search_fields = ('email', 'phone_number', 'address')
 
 admin.site.register(Contact, ContactAdmin)
+
+
+from django.contrib import admin
+from .models import Teacher
+
+@admin.register(Teacher)
+class TeacherAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'phone_number', 'username')
+    search_fields = ('first_name', 'last_name', 'username', 'phone_number')

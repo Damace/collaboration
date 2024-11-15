@@ -26,8 +26,8 @@ class StudentsProxy(StudentRegistration):
 class StudentsAssasmentsProxy(StudentRegistration):
     class Meta:
         proxy = True
-        verbose_name = "Enter Student Assessments"
-        verbose_name_plural = "Enter Student Assessments"
+        verbose_name = "Student Assessments"
+        verbose_name_plural = "Student Assessments"
 
 
 

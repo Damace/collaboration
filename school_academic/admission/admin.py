@@ -655,6 +655,9 @@ from .models import StudentRegistrationProxy  # Adjust import based on your mode
 from django.contrib import admin
 from django.shortcuts import render
 from .models import StudentRegistrationProxy, AcademicYear, Programme, Term, Class, Stream  # Adjust imports as necessary
+from django.urls import path
+from django.template.response import TemplateResponse
+
 
 class StudentRegistrationProxyAdmin(admin.ModelAdmin):
     list_display = ('registration_number', 'first_name', 'last_name')
@@ -664,6 +667,14 @@ class StudentRegistrationProxyAdmin(admin.ModelAdmin):
     change_list_template = "admin/upgradestudents.html"  # Use custom template
 
     actions = ['update_students']
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('update-students/', self.admin_site.admin_view(self.update_students), name='update_students'),
+        ]
+        return custom_urls + urls
+
 
     def changelist_view(self, request, extra_context=None):
         # Fetch filter options
@@ -720,8 +731,7 @@ class StudentRegistrationProxyAdmin(admin.ModelAdmin):
             class_filter = request.POST.get('class_new')
             stream_filter = request.POST.get('stream_new')
             
-            print(academic_year,programme,term,class_filter,stream_filter)
-
+            
         # Update each selected student
         for student_id in student_ids:
             student = StudentRegistrationProxy.objects.get(id=student_id)
@@ -885,29 +895,14 @@ class SetRoomAdmin(admin.ModelAdmin):
     list_filter = ('capacity',)
 
 
-from django.contrib import admin
-from .models import SetSponsor
-
-# @admin.register(SetSponsor)
-# class SetSponsorAdmin(admin.ModelAdmin):
-#     list_display = ('sponsor_name',)
-#     search_fields = ('sponsor_name',)
-
-
 
 from django.contrib import admin
-from .models import SetSponsor, Sponsor
+from .models import Sponsor
 
 class SponsorAdmin(admin.ModelAdmin):
-    list_display = ('sponsor_name', 'mobile', 'email', 'postal_address', 'physical_address')
-    search_fields = ('sponsor_name__sponsor_name',)
+    list_display = ('sponsor_name',)  # Display the sponsor name in the admin list view
+    search_fields = ('sponsor_name',)  # Enable search functionality
 
-    class Media:
-        js = ('js/sponsor_admin.js',)  # Ensure you have this JavaScript file
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        # Customize the queryset for the sponsor_name field if needed
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
+# Register the Sponsor model with the SponsorAdmin configuration
 admin.site.register(Sponsor, SponsorAdmin)
-    
+

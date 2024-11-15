@@ -15,7 +15,7 @@ from django.urls import path
 from .views import student_count_bar_chart
 
 urlpatterns = [
-    path('', sponsor_list, name='sponsor_list'),
+    # path('', sponsor_list, name='sponsor_list'),
     path('sponsor/new/', sponsor_create, name='sponsor_create'),
     path('sponsor/edit/<int:pk>/', sponsor_update, name='sponsor_update'),
     path('sponsor/delete/<int:pk>/', sponsor_delete, name='sponsor_delete'),
@@ -32,6 +32,7 @@ urlpatterns = [
      path('upgrade_students/', views.upgrade_students_view, name='upgrade_students'),
      path('registration-graph/', registration_bar_graph, name='registration_graph'),
      path('student-chart/', student_count_bar_chart, name='student_count_bar_chart'),
+    
 ]
 
 

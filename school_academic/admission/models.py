@@ -41,17 +41,23 @@ class SetSponsor(models.Model):
     sponsor_name = models.CharField(max_length=50, choices=SPONSOR_CHOICES)
 
     def __str__(self):
-        return self.get_sponsor_name_display()  # This will return the human-readable name
+        return self.sponsor_name # This will return the human-readable name
+
+ # Return the display name
+    
+from django.db import models
+from django.db import models
 
 class Sponsor(models.Model):
-    sponsor_name = models.ForeignKey(SetSponsor, on_delete=models.CASCADE)
-    mobile = models.CharField(max_length=15, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    postal_address = models.TextField(blank=True, null=True)
-    physical_address = models.TextField(blank=True, null=True)
+    SPONSOR_NAME_CHOICES = [
+        ('government', 'Government'),
+        ('ngo', 'Non-Government Organization'),
+    ]
+
+    sponsor_name = models.CharField(max_length=50, choices=SPONSOR_NAME_CHOICES)
 
     def __str__(self):
-        return self.sponsor_name.get_sponsor_name_display()  # Return the display name
+        return self.sponsor_name  # Use the field directly without parentheses
 
 
 
@@ -101,6 +107,8 @@ class StudentRegistration(models.Model):
     next_of_kin2_mobile_number = models.CharField(max_length=15, blank=True, null=True)
     next_of_kin2_email = models.EmailField(blank=True, null=True)
     next_of_kin2_postal_address = models.CharField(max_length=255, blank=True, null=True)
+    admission_date = models.DateField(auto_now_add=True)
+
     def __str__(self):
         return f'{self.registration_number} - {self.first_name} {self.last_name}'
 

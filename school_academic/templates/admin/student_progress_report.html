@@ -46,7 +46,7 @@
    
 
 
-<h3>Students Progress Report </h3>
+<span>Get Students Progress Report </span>
 <table> 
     <thead>
         <tr>
@@ -79,6 +79,33 @@
             <td style="float:right"><label for="academic_year">Enter Registration number<span style="color:red">*</span></label></td>
             <td> <input type="text" name ="reg_number" class="form-control"></td>
         </tr>
+
+        <tr>
+          <td style="float:right"><label for="academic_year">Academic Year <span style="color:red">*</span></label></td>
+          <td> <select name="academic_year" id="academic_year" required class="form-control">
+            <option value="">-- Select --</option>
+            {% for year in academic_year %}
+              <option value="{{ year.name }}">{{ year.name }}</option>
+            {% empty %}
+              <option disabled>No academic years available</option>
+            {% endfor %}
+          </select></td>
+      </tr>
+      <tr>
+          <td style="float:right"><label for="term">Term <span style="color:red">*</span></label>
+          </td>
+          <td> <select name="term" id="term" required  class="form-control">
+            <option value="">-- Select --</option>
+            {% for t in term %}
+              <option value="{{ t.name}}">{{ t.name }}</option>
+            {% empty %}
+              <option disabled>No terms available</option>
+            {% endfor %}
+          </select></td>
+      </tr>
+      
+
+
 
         <tr>
              <td></td>

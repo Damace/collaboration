@@ -61,7 +61,7 @@ class StudentsProxyAdmin(admin.ModelAdmin):
              
 
             if not filtered_students.exists():
-                extra_context["error_message"] = "No data found for the selected Categor." 
+                extra_context["error_message"] = "There is no Students name in those categories." 
                 return super().changelist_view(request, extra_context=extra_context)
             else:
                 # If students are found, pass them to the template
@@ -210,10 +210,9 @@ class StudentsAssessmentsProxyAdmin(admin.ModelAdmin):
             programme = request.POST.get("programme")
             new_class = request.POST.get("new_class")
             stream = request.POST.get("stream")
-            exam = request.POST.get("exam")
-            subject = request.POST.get("subject")
+          
             
-            # print( academic_year,term,programme,new_class,stream,subject)
+            # print('#######################################', academic_year,term,programme,new_class,stream,subject)
 
             filtered_students = StudentRegistration.objects.filter(
                 entry_year=academic_year,
@@ -221,7 +220,7 @@ class StudentsAssessmentsProxyAdmin(admin.ModelAdmin):
                 entry_programme=programme,
                 entry_class=new_class,
                 stream_name=stream,
-                subjects=subject,
+            
             )
              
 
@@ -235,10 +234,7 @@ class StudentsAssessmentsProxyAdmin(admin.ModelAdmin):
                 extra_context["selected_programme"] = Programme.objects.get(id=programme).name
                 extra_context["selected_class"] = Class.objects.get(id=new_class).class_name
                 extra_context["selected_stream"] = Stream.objects.get(id=stream).name
-                extra_context["selected_subject"] = Subject.objects.get(id=subject).subject_name
                 extra_context["filtered_students"] = filtered_students
-                extra_context["subject"] = subject
-                extra_context["selected_exams"] =  exam
                 extra_context["filtered_students"] = filtered_students
                
                 return render(request, "admin/students_progress.html", extra_context) 

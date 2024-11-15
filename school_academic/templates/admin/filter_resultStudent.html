@@ -43,32 +43,29 @@
 <body>
 
 <table> 
-    <thead>
-        <tr>
-            <th>Enter Results</th>
-            <th></th>
-        </tr>
-    </thead>
+   
 
-    {% if error_message %}
-    <div class="alert alert-warning" role="alert" id="errorAlert">
-      {{ error_message }}
-    </div>
-    <script>
-      // Hide the alert after 2 seconds
-      setTimeout(function() {
-        const alert = document.getElementById("errorAlert");
-        if (alert) {
-          alert.style.display = "none";
-        }
-      }, 2000);
-    </script>
-  {% endif %}
 
     <form method="post" class="forms-sample">
       {% csrf_token %}
 
- 
+      <fieldset>
+        <legend>Enter students results</legend>
+
+        {% if error_message %}
+        <div class="alert alert-warning" role="alert" id="errorAlert">
+          {{ error_message }}
+        </div>
+        <script>
+          // Hide the alert after 2 seconds
+          setTimeout(function() {
+            const alert = document.getElementById("errorAlert");
+            if (alert) {
+              alert.style.display = "none";
+            }
+          }, 2000);
+        </script>
+      {% endif %}
     <tbody>
         <tr>
             <td style="float:right"><label for="academic_year">Academic Year <span style="color:red">*</span></label></td>
@@ -160,6 +157,8 @@
             <td style="float:right">  <button type="submit" class="btn btn-primary">Get Students</button></td>
         </tr>
     </tbody>
+
+  </fieldset>
   </form>
 </table>
 

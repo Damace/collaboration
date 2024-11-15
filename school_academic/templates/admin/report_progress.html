@@ -14,11 +14,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
 
 {% block content %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple HTML Table</title>
+
     <style>
         table {
 
@@ -39,9 +35,8 @@
             background-color: #e2e2e2;
         }
     </style>
-</head>
+
 <body>
-<h3>Students Progress Report </h3>
 <table> 
     <thead>
         <tr>
@@ -50,6 +45,14 @@
         </tr>
     </thead>
 
+
+    <form method="post" class="forms-sample">
+      {% csrf_token %}
+      <fieldset>
+        <legend>Student assesments</legend>
+ 
+
+        
     {% if error_message %}
     <div class="alert alert-warning" role="alert" id="errorAlert">
       {{ error_message }}
@@ -65,10 +68,8 @@
     </script>
   {% endif %}
 
-    <form method="post" class="forms-sample">
-      {% csrf_token %}
 
- 
+
     <tbody>
         <tr>
             <td style="float:right"><label for="academic_year">Academic Year <span style="color:red">*</span></label></td>
@@ -128,7 +129,7 @@
             {% endfor %}
           </select></td>
         </tr>
-
+{% comment %} 
         <tr>
           <td style="float:right">  <label for="subject">Exam Category  <span style="color:red">*</span></label></td>
           <td>  <select name="exam" id="subject" class="form-control"> 
@@ -153,13 +154,14 @@
               <option disabled>No subjects available</option>
             {% endfor %}
           </select></td>
-      </tr>
+      </tr> {% endcomment %}
       
         <tr>
              <td></td>
             <td style="float:right">  <button type="submit" class="btn btn-primary">Get Students</button></td>
         </tr>
     </tbody>
+  </fieldset>
   </form>
 </table>
 

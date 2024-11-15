@@ -55,7 +55,8 @@ class Result(models.Model):
     exam_type = models.CharField(max_length=100,editable=False)
     registration_number = models.CharField(max_length=100)
     full_name = models.CharField(max_length=100)
-    class_name = models.CharField(null=True,max_length=100) # Replaces char field with a ForeignKey
+    class_name = models.CharField(null=True,max_length=100)
+    stream_name = models.CharField(null=True,max_length=100)# Replaces char field with a ForeignKey
     subject = models.CharField(null=True,max_length=100)  # Links directly to Subject model
     total = models.DecimalField(null=True,max_digits=5, decimal_places=2)
     avg = models.DecimalField(null=True,max_digits=4, decimal_places=2)

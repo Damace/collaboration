@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -17,8 +16,9 @@
     <!-- partial:partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row default-layout-navbar" >
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center" style="background-color:#357ca5">
-        <a class="navbar-brand brand-logo" href="index-2.html"><img src="images/logo.svg" alt="logo"/></a>
-        <a class="navbar-brand brand-logo-mini" href="index-2.html"><img src="images/logo-mini.svg" alt="logo"/></a>
+
+        <label style="font-weight:bold;color:#ffffff">Kondoa Girls High School</label>
+     
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-stretch" style="background-color:#3c8dbc">
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -42,13 +42,8 @@
         </button>
       </div>
     </nav>
-    <!-- partial -->
+  
     <div class="container-fluid page-body-wrapper">
-      <!-- partial:partials/_settings-panel.html -->
-    
-    
-      <!-- partial -->
-      <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar" style="background-color:#1a2226">
         <ul class="nav">
           <li class="nav-item nav-profile">
@@ -57,20 +52,18 @@
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index-2.html">
+            <a class="nav-link" href="{% url 'admin:index' %}">
               <i class="fa fa-home menu-icon"></i>
               <span class="menu-title">Dashboard</span>
             </a>
           </li>
          </ul>
       </nav>
-      <!-- partial -->
+  
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="page-header">
-            <h3 class="page-title">
-             Student Assesments
-            </h3>
+           
           </div>
 
           {% block content %}
@@ -79,8 +72,13 @@
   <p class="alert alert-warning">{{ error_message }}</p>
 {% else %}
   {% if filtered_students %}
-        <form method="post" action="{% url 'add_results' %}"> 
+        {% comment %} <form method="post" action="{% url 'add_results' %}">  {% endcomment %}
       {% csrf_token %}
+
+      <fieldset>
+        <legend><small>Enter students assesments</small></legend>
+
+
 
       <!-- Hidden Fields to Store Selected Criteria -->
       <input type="hidden" name="selected_academic_year" value="{{ selected_academic_year }}">
@@ -96,7 +94,7 @@
             <table id="order-listing" class="table" width="100%">
               <thead>
                 <tr>
-           
+                  <th>S/n</th>
                   <th>Reg. Number</th>
                   <th>First Name</th>
                   <th>Last Name</th>
@@ -106,7 +104,7 @@
               <tbody>
                 {% for student in filtered_students %}
                   <tr>
-                  
+                    <td>{{ forloop.counter }}</td> <!-- Serial Number -->
                     <td>{{ student.registration_number }}</td>
                     <td>{{ student.first_name }}</td>
                     <td>{{ student.last_name }}</td>
@@ -116,9 +114,9 @@
                           <!-- Dummy Modal Ends -->
             <!-- Modal starts -->
             <div class="text-center">
-              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal{{ student.id }}">Add assesments</button>
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal{{ student.id }}" style="padding:6px">Add</button>
             </div>
-            <div class="modal fade" id="exampleModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="exampleModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" width="50%">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -129,7 +127,7 @@
                   </div>
                   <div class="modal-body">
 
-                    <form method="post" action="{% url 'add_assessments' %}"> 
+                    <form method="post" action="{% url 'add_students_assessments' %}"> 
                       {% csrf_token %}
 
                     <input type="hidden" name="selected_academic_year" value="{{ selected_academic_year }}">
@@ -146,15 +144,20 @@
                               <table width="100%">
                                   <tbody>
                                   <tr>
+                                    <td>{{ forloop.counter }}.</td> <!-- Serial Number -->
                                       <td><input type="text" name="assessment_name_{{ assessment.id }}" value="{{ assessment.name}}" readonly style="border:none">
                                      </td>
                                       <td>
-                                      <select name="assessment_grade_{{ assessment.id }}">
-                                        <option value=""> -- Select --</option>
+                                        <b>
+                                      <select name="assessment_grade_{{ assessment.id }}" style="border: none;">
+                                        <option value=""> -- Select grade--</option>
                                         {% for grade in grades %}
+                                        <b>
                                         <option value="grade.grade_name">{{grade.grade_name}}</option>
+                                        </b>
                                         {% endfor %}
                                     </select>
+                                  </b>
                                   
                                     </td>
 
@@ -167,13 +170,12 @@
                     
                   </div>
                   <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Submit</button>
-                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info" style="padding:8px">Submit</button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal" style="padding:8px">Cancel</button>
                   </div>
                 </div>
-              </div>
-            </div>
-
+           
+          </fieldset>
           </form>
             <!-- Modal Ends -->
 

@@ -24,17 +24,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-gnn4+ufp^@qsj$=k0aj32+22)zfx2!t3#vtaz&%9odqn0ztes6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
 INSTALLED_APPS = [
    
-     'adminlteui',
-    'colorfield',  # required dependency
+    'adminlteui',
+    'colorfield',  
     'import_export',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -136,9 +138,10 @@ USE_TZ = True
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static",  # or your specific path
 # ]
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Adjust if your static files are in a different folder
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -357,3 +360,7 @@ JAZZMIN_UI_TWEAKS = {
 
 LOGOUT_REDIRECT_URL = 'http://127.0.0.1:8000'
 
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

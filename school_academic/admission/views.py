@@ -293,6 +293,7 @@ def upgrade_students_view(request):
         class_new = request.POST.get('class_new')
         stream = request.POST.get('stream_new')
         
+    
      
         # Process each selected student
         selected_students = request.POST.getlist('selected_students')

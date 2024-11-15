@@ -26,3 +26,27 @@ class StudentAssignment(models.Model):
 
     def __str__(self):
         return f"{self.subject_name} - {self.deadline_date}"
+
+
+
+
+
+class StudentsAttendance(models.Model):
+    PRESENT = 'Present'
+    ABSENT = 'Absent'
+    ATTENDANCE_CHOICES = [
+        (PRESENT, 'Present'),
+        (ABSENT, 'Absent'),
+    ]
+    
+    student = models.ForeignKey(StudentRegistration, on_delete=models.CASCADE)
+    reason = models.ForeignKey(AbsentReason, null=True, blank=True, on_delete=models.SET_NULL)
+    attendance_status = models.CharField(
+        max_length=10,
+        choices=ATTENDANCE_CHOICES,
+        default=PRESENT,
+    )
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.first_name} {self.student.last_name} - {self.attendance_status}"
