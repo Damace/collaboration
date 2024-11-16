@@ -315,126 +315,97 @@ from django.contrib import admin
 from django.db import models
 from django.db.models import Count, Q
 from decimal import Decimal, InvalidOperation
+from collections import defaultdict
+from django.db import models
 
+
+
+############################################################################################################################################
 
 class PublishAdmin(admin.ModelAdmin):
     list_display = ('program_name',)
-    actions = ['publish_selected', 'unpublish_selected']  # Add custom actions
-
+    actions = ['publish_selected', 'unpublish_selected'] 
+    
     def publish_selected(self, request, queryset):
-        for que_result in queryset:
-            try:
-                # Aggregate total and average results
-                aggregated_results = QueResults.objects.filter(
-                    academic_year=que_result.academic_year,
-                    term=que_result.term,
-                    exam_type=que_result.exam_type,
-                    registration_number=que_result.registration_number,
-                    student_name=que_result.student_name
-                ).aggregate(
-                    total=models.Sum('result'),
-                    average=models.Avg('result')
-                )
-
-                total_result = aggregated_results['total']
-                average_result = aggregated_results['average']
-
-                # Validate results before proceeding
-                if total_result is None or average_result is None:
-                    continue  # Skip this entry if totals are None
-
-                # Convert to Decimal to ensure valid operations
-                total_result = Decimal(total_result) if total_result is not None else Decimal(0)
-                average_result = Decimal(average_result) if average_result is not None else Decimal(0)
-
-                # Determine grade and division
-                grade_instance = GradeScale.objects.filter(
-                    minimum_marks__lte=average_result
-                ).order_by('-minimum_marks').first()
-
-                grade_name = grade_instance.grade_name if grade_instance else None
-                grade_point = grade_instance.grade_point if grade_instance else None
-
-                division_instance = GradeDivision.objects.filter(
-                    minimum_division_point__lte=average_result
-                ).order_by('-minimum_division_point').first()
-
-                division_title = division_instance.division_title if division_instance else None
-
-                # Update or create Result entry
-                existing_result = Result.objects.filter(
-                    academic_year=que_result.academic_year,
-                    term=que_result.term,
-                    registration_number=que_result.registration_number,
-                    full_name=que_result.student_name
-                ).first()
-
-                if existing_result:
-                    existing_result.subject += f", {que_result.result_summary}"
-                    existing_result.total = total_result
-                    existing_result.avg = average_result
-                    existing_result.grade = grade_name
-                    existing_result.point = grade_point
-                    existing_result.division = division_title
-                    existing_result.save()
-                else:
-                    Result.objects.create(
-                        academic_year=que_result.academic_year,
-                        term=que_result.term,
-                        exam_type=que_result.exam_type,
-                        registration_number=que_result.registration_number,
-                        full_name=que_result.student_name,
-                        subject=que_result.result_summary,
-                        total=total_result,
-                        avg=average_result,
-                        grade=grade_name,
-                        point=grade_point,
-                        division=division_title
-                    )
-
-                # Count each division title for the academic year, term, and exam type
-                division_counts = Result.objects.filter(
-                    academic_year=que_result.academic_year,
-                    term=que_result.term,
-                    exam_type=que_result.exam_type
-                ).aggregate(
-                    grade_I=Count('division', filter=Q(division="I")),
-                    grade_II=Count('division', filter=Q(division="II")),
-                    grade_III=Count('division', filter=Q(division="III")),
-                    grade_IV=Count('division', filter=Q(division="IV")),
-                    grade_0=Count('division', filter=Q(division="0")),
-                    incomplete=Count('division', filter=Q(division="INC")),
-                    absent=Count('division', filter=Q(division="ABS"))
-                )
-
-                # Update or create the ResultSummary record
-                ResultSummary.objects.update_or_create(
-                    academic_year=que_result.academic_year,
-                    term=que_result.term,
-                    exam_type=que_result.exam_type,
-                    registration_number=que_result.registration_number,
-                    defaults={
-                        'grade_I': division_counts['grade_I'],
-                        'grade_II': division_counts['grade_II'],
-                        'grade_III': division_counts['grade_III'],
-                        'grade_IV': division_counts['grade_IV'],
-                        'grade_0': division_counts['grade_0'],
-                        'incomplete': division_counts['incomplete'],
-                        'absent': division_counts['absent']
-                    }
-                )
-
-            except InvalidOperation as e:
-                    self.message_user(request, "Results Published Successfully.")
-            except Exception as e:
-                   self.message_user(request, "Results Published Successfully.")
-
-        # self.message_user(request, "Results Published Successfully.")
-
-    publish_selected.short_description = "Publish selected Exam"
+        division_counts = defaultdict(int)
+        que_results = QueResults.objects.values('academic_year', 'term', 'exam_type', 'registration_number', 'student_name', 'result', 'result_summary')
+        for que_result in que_results:
+            aggregated_results = QueResults.objects.filter(
+            academic_year=que_result['academic_year'],
+            term=que_result['term'],
+            exam_type=que_result['exam_type'],
+            registration_number=que_result['registration_number'],
+            student_name=que_result['student_name']
+        ).aggregate(
+            total=models.Sum('result'),
+            average=models.Avg('result')
+        )
+        
+        total_result = aggregated_results['total'] 
+        average_result = aggregated_results['average'] 
+        
+        # Determine grade and division
+        grade_instance = GradeScale.objects.filter(minimum_marks__lte=average_result).order_by('-minimum_marks').first()
+        grade_name = grade_instance.grade_name if grade_instance else None
+        grade_point = grade_instance.grade_point if grade_instance else None
+        
+        division_instance = GradeDivision.objects.filter(minimum_division_point__lte=average_result).order_by('-minimum_division_point').first()
+        division_title = division_instance.division_title if division_instance else None
+        
+        # Count the division title
+        if division_title in ['I', 'II', 'III', 'IV', '0', 'INC', 'ABS']:
+            division_counts[division_title] += 1
+        
+        # Update or create Result instance
+        existing_result = Result.objects.filter(
+            academic_year=que_result['academic_year'],
+            term=que_result['term'],
+            registration_number=que_result['registration_number'],
+            full_name=que_result['student_name']
+        ).first() 
+        
+        if existing_result: 
+            existing_result.subject += f", {que_result['result_summary']}"  
+            existing_result.total = total_result 
+            existing_result.avg = average_result
+            existing_result.grade = grade_name  # Update the grade
+            existing_result.point = grade_point  # Update the grade point
+            existing_result.division = division_title
+            existing_result.save() 
+        else:
+            Result.objects.create(
+                academic_year=que_result['academic_year'],
+                term=que_result['term'],
+                exam_type=que_result['exam_type'],
+                registration_number=que_result['registration_number'],
+                full_name=que_result['student_name'],
+                subject=que_result['result_summary'],
+                total=total_result,
+                avg=average_result,  
+                grade=grade_name,  # Update the grade
+                point=grade_point,
+                division=division_title
+            )
+            
+            result_summary, created = ResultSummary.objects.get_or_create(
+                academic_year=que_result['academic_year'],
+                term=que_result['term'],
+                registration_number=que_result['registration_number'],
+            )
 
 
-
+            result_summary.grade_I += division_counts['I']
+            result_summary.grade_II += division_counts['II']
+            result_summary.grade_III += division_counts['III']
+            result_summary.grade_IV += division_counts['IV']
+            result_summary.grade_0 += division_counts['0']
+            result_summary.incomplete += division_counts['INC']
+            result_summary.absent += division_counts['ABS']
+            result_summary.save()
+            
+            self.message_user(request, "Results Published Successfully.")
+          
+         
 admin.site.register(Publish, PublishAdmin)
 
 

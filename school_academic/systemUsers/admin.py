@@ -1,28 +1,25 @@
-# admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, StudentProfile, TeacherProfile, AcademicProfile, AdmissionProfile, PrincipalProfile, AdministratorProfile
+from .models import CustomUser
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    # list_display = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff')
-    
-        # Customize fieldsets
-    # fieldsets = (
-    
-    #     ('Permissions', {
-    #         'fields': ( 'is staff',),
-    #         'description': "Custom label for 'is_staff' will be applied."
-    #     }),
-       
-    # )
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('is_student',)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('is_student',)}),
+    )
+    list_display = UserAdmin.list_display + ('is_student',) 
 
 admin.site.register(CustomUser, CustomUserAdmin)
-# admin.site.register(StudentProfile)
-# admin.site.register(TeacherProfile)
-# admin.site.register(AcademicProfile)
-# admin.site.register(AdmissionProfile)
-# admin.site.register(PrincipalProfile)
-# admin.site.register(AdministratorProfile)
 
 
+from django.contrib import admin
+from .models import BulkSMS
+
+@admin.register(BulkSMS)
+class BulkSMSAdmin(admin.ModelAdmin):
+    list_display = ('phone_number', 'created_at')
+    search_fields = ('phone_number', 'message')
+    list_filter = ('created_at',)

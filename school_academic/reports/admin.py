@@ -42,9 +42,13 @@ class AnnualReports(admin.ModelAdmin):
         if request.method == 'POST':
             
             academic_year_name = request.POST.get('academic_year_name')
+            
+          
 
             filtered_data = Result.objects.filter(academic_year=academic_year_name)
             filtered_data_2 = ResultSummary.objects.filter(academic_year=academic_year_name)
+            
+            print('#########################',filtered_data_2)
           
         
             if not filtered_data.exists():
@@ -196,7 +200,7 @@ class ProgressReportsAdmin(admin.ModelAdmin):
 
 
             response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="annual_report.pdf"'
+            response['Content-Disposition'] = 'attachment; filename="Student_progress_report.pdf"'
             return response
 
         return super().changelist_view(request, extra_context=extra_context)
@@ -260,42 +264,55 @@ class ProgressReportsAdmin(admin.ModelAdmin):
 
 @admin.register(TermReports)
 class TermReports(admin.ModelAdmin):
+    
     change_list_template = "admin/report_term.html"
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        logo_url =  request.build_absolute_uri(static('logo_.png')) 
+        logo_url = request.build_absolute_uri(static('logo_.png'))
         extra_context.update({
             "academic_year": AcademicYear.objects.all(),
-             "terms": Term.objects.all(),
-             "classes": Class.objects.all(),
-             "streams": Stream.objects.all(),
-            "title": "Term Report",
-            "logo_url": logo_url  # Adjust this line
+            "academic_year": AcademicYear.objects.all(),
+            "terms": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "streams": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "assessments": Assessment.objects.all(),
+            "grades": GradeScale.objects.all(),
+            "title": "Term report",
+            "logo_url": logo_url # Adjust this line
+           
         })
+
         
         if request.method == 'POST':
             
-            academic_year = request.POST.get('academic_year')
+            academic_year_name = request.POST.get('academic_year_name_')
+            
             academic_term = request.POST.get('academic_term')
+             
             academic_class = request.POST.get('class')
+            
             academic_stream = request.POST.get('stream')
-  
-            filtered_data = Result.objects.filter(
-                academic_year=academic_year, 
-                term=academic_term,
-                class_name=academic_class,  
-                stream_name=academic_stream
-            )
+            
+           
+          
 
+            filtered_data = Result.objects.filter(academic_year=academic_year_name)
+            filtered_data_2 = ResultSummary.objects.filter(academic_year=academic_year_name)
+            
+          
+    
         
             if not filtered_data.exists():
                
-                extra_context["error_message"] = "No data found for the selected academic year and Term." 
+                extra_context["error_message"] = "No data found for the selected academic year." 
                 return super().changelist_view(request, extra_context=extra_context)
 
            
-            pdf = self.generate_pdf(filtered_data, academic_year,logo_url)
+            pdf = self.generate_pdf(filtered_data,filtered_data_2,logo_url,academic_year_name)
             
           
             response = HttpResponse(pdf, content_type='application/pdf')
@@ -304,18 +321,16 @@ class TermReports(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-    def generate_pdf(self, filtered_data, logo_url,academic_year): 
-        academic_year_name = f'{'40000'}{academic_year}'
-        html_content = render_to_string('admin/report_term_.html', {'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year_name})
+    def generate_pdf(self, filtered_data,filtered_data_2, logo_url,academic_year_name): 
+        date = timezone.now().strftime('%d-%m-%Y')
+        html_content = render_to_string('admin/term_report_.html', {'data': filtered_data,'data2':filtered_data_2,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
         pdf = weasyprint.HTML(string=html_content).write_pdf()
         return pdf
-    
-    
-    
+      
 
     def has_add_permission(self, request):
         return False
-    
+
     
     
  ##################################################################### INLINE EDIT FIELDS #########################################################################   
@@ -405,99 +420,81 @@ class StudentAssessmentAdmin(admin.ModelAdmin):
     
 ################################################################ end DROPDOWN EDIT ################################################################################
     
-    
-    
-    
-    
-# @admin.register(ClassListReports)
-# class ClassListReports(admin.ModelAdmin):
-#     change_list_template = "admin/report_annual.html"
+   
+@admin.register(ClassListReports)
+class ClassListReports(admin.ModelAdmin):
+    change_list_template = "admin/class_report_.html"
 
-#     def changelist_view(self, request, extra_context=None):
-#         extra_context = extra_context or {}
-#         logo_url =  request.build_absolute_uri(static('logo_.png')) 
-#         extra_context.update({
-#             "academic_year": AcademicYear.objects.all(),
-#             "title": "Annual Report",
-#             "logo_url": logo_url  # Adjust this line
-#         })
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        logo_url = request.build_absolute_uri(static('logo_.png'))
+        extra_context.update({
+            "academic_year": AcademicYear.objects.all(),
+            "academic_year": AcademicYear.objects.all(),
+            "terms": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "streams": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "assessments": Assessment.objects.all(),
+            "grades": GradeScale.objects.all(),
+            "title": "Term report",
+            "logo_url": logo_url # Adjust this line
+           
+        })
+
         
-#         if request.method == 'POST':
+        if request.method == 'POST':
             
-#             academic_year_name = request.POST.get('academic_year_name')
-
-#             filtered_data = Result.objects.filter(academic_year=academic_year_name)
+            academic_year_name = request.POST.get('academic_year_name_')
+            
+            academic_term = request.POST.get('academic_term')
+             
+            academic_class = request.POST.get('class')
+            
+            academic_stream = request.POST.get('stream')
+            
+           
           
+
+            filtered_data = Result.objects.filter(academic_year=academic_year_name)
+            filtered_data_2 = ResultSummary.objects.filter(academic_year=academic_year_name)
+            
+          
+    
         
-#             if not filtered_data.exists():
+            if not filtered_data.exists():
                
-#                 extra_context["error_message"] = "No data found for the selected academic year." 
-#                 return super().changelist_view(request, extra_context=extra_context)
+                extra_context["error_message"] = "No data found for the selected academic year." 
+                return super().changelist_view(request, extra_context=extra_context)
 
            
-#             pdf = self.generate_pdf(filtered_data,logo_url)
+            pdf = self.generate_pdf(filtered_data,filtered_data_2,logo_url,academic_year_name)
             
           
-#             response = HttpResponse(pdf, content_type='application/pdf')
-#             response['Content-Disposition'] = 'attachment; filename="annual_report.pdf"'
-#             return response
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="class_report.pdf"'
+            return response
 
-#         return super().changelist_view(request, extra_context=extra_context)
+        return super().changelist_view(request, extra_context=extra_context)
 
-#     def generate_pdf(self, filtered_data, logo_url,academic_year_name): 
-#         html_content = render_to_string('admin/report_annual_.html', {'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year_name})
-#         pdf = weasyprint.HTML(string=html_content).write_pdf()
-#         return pdf
-    
-    
+    def generate_pdf(self, filtered_data,filtered_data_2, logo_url,academic_year_name): 
+        date = timezone.now().strftime('%d-%m-%Y')
+        html_content = render_to_string('admin/class_rpt.html', {'data': filtered_data,'data2':filtered_data_2,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
+        pdf = weasyprint.HTML(string=html_content).write_pdf()
+        return pdf
+      
 
-#     def has_add_permission(self, request):
-#         return False
+    def has_add_permission(self, request):
+        return False
+
     
 # @admin.register(SubjectReports)
-# class SubjectReports(admin.ModelAdmin):
-#     change_list_template = "admin/report_annual.html"
+class SubjectReports(admin.ModelAdmin):
+   
 
-#     def changelist_view(self, request, extra_context=None):
-#         extra_context = extra_context or {}
-#         logo_url =  request.build_absolute_uri(static('logo_.png')) 
-#         extra_context.update({
-#             "academic_year": AcademicYear.objects.all(),
-#             "title": "Annual Report",
-#             "logo_url": logo_url  # Adjust this line
-#         })
-        
-#         if request.method == 'POST':
-            
-#             academic_year_name = request.POST.get('academic_year_name')
-            
-#             filtered_data = Result.objects.filter(academic_year=academic_year_name)
-          
-        
-#             if not filtered_data.exists():
-               
-#                 extra_context["error_message"] = "No data found for the selected academic year." 
-#                 return super().changelist_view(request, extra_context=extra_context)
-
-           
-#             pdf = self.generate_pdf(filtered_data,logo_url,academic_year_name)
-            
-          
-#             response = HttpResponse(pdf, content_type='application/pdf')
-#             response['Content-Disposition'] = 'attachment; filename="annual_report.pdf"'
-#             return response
-
-#         return super().changelist_view(request, extra_context=extra_context)
-
-#     def generate_pdf(self, filtered_data, logo_url,academic_year_name): 
-
-#         html_content = render_to_string('admin/report_annual_.html', {'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year_name})
-#         pdf = weasyprint.HTML(string=html_content).write_pdf()
-#         return pdf
-    
-    
-
-#     def has_add_permission(self, request):
-#         return False
+    def has_add_permission(self, request):
+        return False
     
     

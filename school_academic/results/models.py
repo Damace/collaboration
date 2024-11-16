@@ -117,5 +117,5 @@ class ResultSummary(models.Model):
     absent = models.PositiveIntegerField(default=0)        # ABS (Absent)
 
     def __str__(self):
-        return f"Result Summary for {self.registration_number} - {self.academic_year.name} {self.term.name}"
+        return f"Result Summary for {self.registration_number}"
 

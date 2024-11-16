@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+            margin: 0;
+            padding: 10px; /* Add padding for better spacing */
+        }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            align-items: center; /* Align items vertically */
+            
+            
+        }
+
+        h1 {
+            color: #1c1d1c;
+            margin: 0; /* Remove default margin */
+            text-align: center; /* Center title */
+            flex-grow: 1; /* Allow the title to take available space */
+        }
+
+        .contacts {
+            text-align: center; /* Center contacts */
+            
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            max-width: 150px; /* Limit maximum width */
+            overflow-wrap: break-word; /* Allow words to break */
+            word-break: break-word; /* Break long words */
+            white-space: normal; /* Allow text to wrap */
+            height: auto; /* Allow height to adjust */
+        }
+
+        /* Specific style for the subject column */
+        td.subject {
+            max-width: 200px; /* Set a specific max width for the subject column */
+        }
+
+        th {
+            background-color: #515451;
+            color: white;
+            font-weight: bold;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            h1 {
+                margin: 0 0 10px 0; /* Reduce margin for print */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+
+        {% load static %}
+        <img src="{{ logo_url }}" alt="" style="height: 120px;">
+        <h1>KONDOA GIRLS SECONDARY SCHOOL <br><small>example.com | Phone: (123) 456-7890</small></h1>
+       
+    </div>
+
+    <div style="display: flex; justify-content: space-between; width: 100%;">
+        <label style="padding-left:10px"><b>Class Report: {{academic_year}}</b></label>
+        <label  style="padding-right:10px"><b>Date: {{date}}</b></label>
+    </div>
+    <hr style="flex-grow: 10; margin: 0 10px;width=100%">
+    <hr style="flex-grow: 20; margin: 0 10px;width=100%">
+    
+    <table>
+        <thead>
+            <tr>
+                <th colspan="8" style="text-align:left;">Results Division Summary</th> <!-- Merged header -->
+            </tr>
+            <tr>
+                <th>I</th>
+                <th>II</th>
+                <th>III</th>
+                <th>IV</th>
+                <th>0</th>
+                <th>INC</th>
+                <th>ABS</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            {% comment %} {% for item in data2 %} {% endcomment %}
+            <tr>
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+                <td><small>1</small></td> 
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+
+                {% comment %} <td><small>{{ item.grade_I }}</small></td>
+                <td><small>{{ item.grade_II}}</small></td>
+                <td><small>{{ item.grade_III }}</small></td> 
+                <td><small>{{ item.grade_IV }}</small></td>
+                <td><small>{{ item.grade_0 }}</small></td>
+                <td><small>{{ item.incomplete }}</small></td>
+                <td><small>{{ item.absent }}</small></td> {% endcomment %}
+              
+            
+            </tr>
+            {% comment %} {% empty %} {% endcomment %}
+           
+            {% comment %} {% endfor %} {% endcomment %}
+        </tbody>
+    </table>
+{% comment %} ##################################################################################################### {% endcomment %}
+
+    <table>
+        <thead>
+            <tr>
+                <th colspan="8" style="text-align: left;">All Results</th> <!-- Merged header -->
+            </tr>
+            <tr>
+                <th>Index</th>
+                <th>Full Name</th>
+                <th class="subject">Subject</th> <!-- Added class for specific styling -->
+                 <th>Total</th>
+                 <th>Avg</th>
+                 <th>Grade</th>
+                 <th>Point</th>
+                 <th>Division</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td><small>{{ item.registration_number }}</small></td>
+                <td><small>{{ item.full_name }}</small></td>
+                <td><small>{{ item.subject }}</small></td> <!-- Added class for specific styling -->
+                <td><small>{{ item.total }}</small></td>
+                <td><small>{{ item.avg }}</small></td>
+                <td><small>{{ item.grade }}</small></td>
+                <td><small>{{ item.point }}</small></td>
+                <td><small>{{ item.division }}</small></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: red;">No data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

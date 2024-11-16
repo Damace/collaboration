@@ -133,8 +133,6 @@ class Stream(models.Model):
 
 from django.db import models
 from django.conf import settings  # Make sure to import settings
-from systemUsers.models import CustomUser, TeacherProfile  # Assuming your TeacherProfile is part of CustomUser or another model
-
 from django.utils import timezone
 # from .models import AcademicYear, Term, Subject, Class, TeacherProfile
 

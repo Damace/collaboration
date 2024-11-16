@@ -41,7 +41,7 @@
 <form method="post" class="forms-sample mt-4">
   {% csrf_token %}
   <fieldset>
-    <legend style="font-size: 1.5em; color: #000000;"><small>Term Report</small></legend>
+    <legend style="font-size: 1.5em; color: #000000;"><small>Class Report</small></legend>
 
     
 {% if error_message %}
@@ -99,18 +99,7 @@
                   </select>
               </td>
           </tr>
-          <tr>
-              <td style="float:right"> <label for="stream_name">Stream <span class="text-danger">*</span></label></td>
-              <td>
-                  <select name="stream" id="stream_name" class="form-control" required>
-                      <option value="0">-- Select --</option>
-                      {% for stream in streams %}
-                          <option value="{{ stream.name }}">{{ stream.name }}</option>
-                      {% empty %}
-                          <option disabled>No academic years available</option>
-                      {% endfor %}
-                  </select>
-              </td>
+         
           </tr>
           <tr>
               <td></td>
