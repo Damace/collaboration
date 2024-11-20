@@ -52,3 +52,29 @@ class QueResults(models.Model):
 
     def __str__(self):
         return f"{self.student_name} - {self.subject} ({self.result})"
+
+class StudentsResult(models.Model):
+    registration_number = models.CharField(max_length=50)
+    entry_year = models.CharField(max_length=20)
+    entry_term = models.CharField(max_length=20)
+    entry_programme = models.CharField(max_length=100)
+    entry_class = models.CharField(max_length=50)
+    stream_name = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    mt3 = models.FloatField()
+    mt4 = models.FloatField()
+    mte2 = models.FloatField()
+    ae = models.FloatField()
+    hpbt1 = models.FloatField()
+    hpbt2 = models.FloatField()
+    hpbt3 = models.FloatField()
+    average = models.FloatField()
+    grade = models.CharField(max_length=2)
+    remark = models.CharField(max_length=100)
+    position = models.IntegerField()
+    
+    def __str__(self):
+        return f"{self.full_name} - {self.subject} ({self.academic_year} - {self.term})"
+
+

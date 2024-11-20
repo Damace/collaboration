@@ -82,7 +82,7 @@
     <div class="header">
         {% load static %}
         <img src="{{ logo_url }}" alt="School Logo" style="height: 100px;">
-        <h2  style="padding-left: 10px;">KONDOA GIRLS SECONDARY SCHOOL <br><small>P.O Box 193 Kondoa | Phone: (255) 713448417</small><br>
+        <h2  style="padding-left: 10px;">KONDOA GIRLS SECONDARY SCHOOL <br><small>P.O Box 193 Kondoa | Mobile: (255) 713448417</small><br>
             <small>Email:kondoagirls@gmail.com</small></h1>
         <img src="{{ profile_image }}" alt="Profile Image" style="height: 80px;">
     </div>
@@ -125,34 +125,73 @@
             <td></td>
         </tr>
     </table>
-    <table>
+
+
+    <h3 align="left">Result for Academic Year {{ academic_year }}    -  {{ term }} </h2>
+    <table id="order-listing" class="table" width="100%">
         <thead>
             <tr>
-                <th>S/N</th> 
-                <th>Subject name</th>
-                <th>Total Score</th>
-                  <th>Average</th>
-                  <th>Points</th>
-                 <th>Grade</th>
-                 <th>Division</th>
+                <th>S/N</th>
+                <th>Subject Name</th>
+                <th>MT3</th>
+                <th>MT4</th>
+                <th>MT2</th>
+                <th>AE</th>
+                <th>HPBT2</th>
+                <th>Average</th>
+                <th>Grade</th>
+                <th>Remark</th>
+                <th>Position</th>
             </tr>
         </thead>
         <tbody>
-            {% for result in results %}
-            <tr>
-                <td>{{ result.sn }}</td>
-                <td>{{ result.subject_name }}</td>
-                <td>{{ result.total }}</td>
-                <td>{{ result.average }}</td>
-                 <td>{{ result.remark }}</td>
-                <td>{{ result.grade }}</td>
-                 <td>{{ result.position }}</td>
-            </tr>
+            {% for result in student_academic_info %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ result.subject }}</td>
+                    <td>{{ result.mt3 }}</td>
+                    <td>{{ result.mt4 }}</td>
+                    <td>{{ result.mt2 }}</td>
+                    <td>{{ result.ae }}</td>
+                    <td>{{ result.hpbt2 }}</td>
+                    <td>{{ result.average }}</td>
+                    <td>{{ result.grade }}</td>
+                    <td>{{ result.remark }}</td>
+                    <td>{{ result.position }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12">No results found.</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
+
+        <table border="0">
+         
+            <tbody>
+                <b>
+                <tr>
+                    <td>TOTAL AVERAGE:  </td>
+                    <td>AVERAGE:  </td>
+                    <td>POSITION:  </td>
+                    <td>OUT OF:   </td>
+                    <td>POINT:   </td>
+                    <td>DIVISION:  </td>
+                </tr>
+            </b>
+            </tbody>
+        </table>
     
-    
+
+
+
+
+
+
+
+
+
     
     <h3 align="left">Character Assessment</h2>
     
@@ -197,11 +236,95 @@
             </tr>
         </tbody>
     </table>
-    
 
-    
+
    
+    <table>
+        <h3>Grade Scale</h3>
+        <thead>
+            <tr>
+                <th>Grade</th>
+                <th>Range</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>A</td>
+                <td>80 - 100</td>
+                <td>EXCELLENT</td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>70 - 79</td>
+                <td>VERY GOOD</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>60 - 69</td>
+                <td>GOOD</td>
+            </tr>
+            <tr>
+                <td>D</td>
+                <td>50 - 59</td>
+                <td>AVERAGE</td>
+            </tr>
+            <tr>
+                <td>E</td>
+                <td>40 - 49</td>
+                <td>SATISFACTORY</td>
+            </tr>
+            <tr>
+                <td>F</td>
+                <td>35 - 39</td>
+                <td>SUBSIDIARY</td>
+            </tr>
+            <tr>
+                <td>F</td>
+                <td>0 - 34</td>
+                <td>FAIL</td>
+            </tr>
+        </tbody>
+    </table>
+    <br><p>
+
+
+    <h3 align="left">Comments</h2>
     
+    <table>
+        
+        <tbody>
+            <tr>
+                <td>CLASS TEACHER:</td>
+                <td>ACADEMIC TEACHER: </td>
+            </tr>
+            <tr>
+                <td>NAME & SIGN:</td>
+                <td>NAME & SIGN: </td>
+            </tr>
+            <tr>
+                <td>DATE:</td>
+                <td>DATE:</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table>
+        <tbody>
+            <tr>
+                <td colspan="2">HEAD OF SCHOOL: </td>
+            </tr>
+            <tr>
+                <td>NAME & SIGN:</td>
+            </tr>
+            <tr>
+                <td>DATE:</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
 
 
 

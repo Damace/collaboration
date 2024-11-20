@@ -15,6 +15,7 @@ urlpatterns = [
     path('', include('admission.urls')),
     path('', include('systemUsers.urls')),
     path('', include('Record_results.urls')),
+    path('', include('reports.urls')),
  
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

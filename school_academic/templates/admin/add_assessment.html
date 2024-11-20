@@ -67,74 +67,69 @@
           </div>
 
           {% block content %}
-
-{% if error_message %}
-  <p class="alert alert-warning">{{ error_message }}</p>
-{% else %}
-  {% if filtered_students %}
-        {% comment %} <form method="post" action="{% url 'add_results' %}">  {% endcomment %}
-      {% csrf_token %}
-
-      <fieldset>
-        <legend><small>Enter students assesments</small></legend>
-
-
-
-      <!-- Hidden Fields to Store Selected Criteria -->
-      <input type="hidden" name="selected_academic_year" value="{{ selected_academic_year }}">
-      <input type="hidden" name="selected_term" value="{{ selected_term }}">
-      <input type="hidden" name="selected_programme" value="{{ selected_programme }}">
-      <input type="hidden" name="selected_class" value="{{ selected_class }}">
-      <input type="hidden" name="selected_exams" value="{{ selected_exams }}">
-      <input type="hidden" name="selected_subject" value="{{ selected_subject }}">
-
-      <div class="card">
-        <div class="card-body">
-          <div class="table-responsive">
-            <table id="order-listing" class="table" width="100%">
-              <thead>
-                <tr>
-                  <th>S/n</th>
-                  <th>Reg. Number</th>
-                  <th>First Name</th>
-                  <th>Assesments</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for student in filtered_students %}
-                  <tr>
-                    <td>{{ forloop.counter }}</td> <!-- Serial Number -->
-                    <td>{{ student.registration_number }}</td>
-                    <td>{{ student.first_name }}&nbsp&nbsp&nbsp&nbsp{{ student.last_name }}</td>
-                  
-                    <td>
-
-                   <a href="{% url 'add_assessment' registration_number=student.registration_number %}" target="_blank">Add</a>
-
-
-
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
+          <form method="post" action="{% url 'save_assessment' %}"> 
+            {% csrf_token %}
+       
+            <input type="hidden" name="registration_number" value="{{ student.registration_number }}">
+            <input type="hidden" name="full_name" value=" {{ student.first_name }} &nbsp&nbsp{{ student.last_name }}">
+            <input type="hidden" name="entry_year" value="{{ student.entry_year }}">
+            <input type="hidden" name="entry_term" value="{{ student.entry_term }}">
+            <input type="hidden" name="entry_programme" value="{{ student.entry_programme }}">
+            <input type="hidden" name="entry_class" value="{{ student.entry_class }}">
+            <input type="hidden" name="stream_name" value="{{ student.stream_name }}">
+    
+            <h3>Add Assessment for {{ student.first_name }} {{ student.last_name }}</h3>
+            <p>Registration Number: {{ student.registration_number }}</p>
+           
+            
+            <h2>Subjects</h2>
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">S/n</th>
+                        <th style="width: 10%;">Subject Code</th>
+                        <th style="width: 20%;">Subject Name</th>
+                        <th style="width: 7%;">MT3</th>
+                        <th style="width: 7%;">MT4</th>
+                        <th style="width: 7%;">MTE2</th>
+                        <th style="width: 7%;">AE</th>
+                        <th style="width: 7%;">HPBT1</th>
+                        <th style="width: 7%;">HPBT2</th>
+                        <th style="width: 7%;">HPBT3</th>
+                        <th style="width: 7%;">Average</th>
+                        <th style="width: 7%;">Grade</th>
+                        <th style="width: 10%;">Remark</th>
+                        <th style="width: 10%;">Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                        <tr>
+                            <td style="text-align: center;">{{ forloop.counter }}</td>
+                            <td style="text-align: center;">{{ subject.subject_code }}</td>
+                            <td style="text-align: left;">{{ subject.subject_name }}</td>
+                            <!-- Input fields -->
+                            <td><input type="text" name="mt3_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="mt4_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="mte2_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="ae_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="hpbt1_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="hpbt2_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="hpbt3_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="average_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="grade_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="remark_{{ subject.id }}" required style="width: 100%;"></td>
+                            <td><input type="text" name="position_{{ subject.id }}" required style="width: 100%;"></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
-          </div>
-        </div>
-      </div>
-  {% else %}
-    <p>No students available for the selected criteria.</p>
-  {% endif %}
-{% endif %}
 
-<script>
-  // JavaScript to handle Select All functionality
-  document.getElementById('select-all').addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.select-student');
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = this.checked;
-    });
-  });
-</script>
+            <br>
+            <div align="right">
+            <button type="submit" class="btn btn-info">Save Assessment</button>
+            </div>
+        </form>
 
 {% endblock %}
 

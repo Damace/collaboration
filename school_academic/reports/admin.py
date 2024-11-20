@@ -13,6 +13,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from exam_setting.models import ExamsCategory, GradeScale
+from Record_results.models import StudentsResult
 from weasyprint import HTML
 from django.contrib import admin
 from django.http import HttpResponse
@@ -158,9 +159,68 @@ class ProgressReportsAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        logo_url = request.build_absolute_uri(static('logo_.png'))
-        profile_image = request.build_absolute_uri(static('profile.png'))
+        extra_context.update({
+            "academic_year": AcademicYear.objects.all(),
+            "term": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "streams": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "assessments": Assessment.objects.all(),
+             "grades": GradeScale.objects.all(),
+            
+            "title": "Filter student to",
+        })
 
+        if request.method == "POST":
+            academic_year = request.POST.get("academic_year")
+            term = request.POST.get("term_name")
+            new_class = request.POST.get("class_name")
+            stream = request.POST.get("stream_name")
+          
+            
+            # print('#######################################', academic_year,term,new_class,stream)
+
+            filtered_students = StudentRegistration.objects.filter(
+                entry_year_id=academic_year,
+                entry_term_id=term,
+                entry_class_id=new_class,
+                stream_name_id=stream,
+            
+            )
+             
+
+            if not filtered_students.exists():
+                extra_context["error_message"] = "No data found for the selected Category." 
+                return super().changelist_view(request, extra_context=extra_context)
+            else:
+                extra_context = {
+                    "selected_academic_year": AcademicYear.objects.get(id=academic_year).name,
+                    "selected_term":Term.objects.get(id=term).name,
+                    "selected_class":Class.objects.get(id=new_class).class_name,
+                    "selected_stream":Stream.objects.get(id=stream).name,
+                    "filtered_students": filtered_students
+    }
+               
+               
+            return render(request, "admin/students_progress_results.html", extra_context) 
+            # return super().changelist_view(request, extra_context=extra_context)
+        
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+    
+#@admin.register(TermReports)
+class TermReports(admin.ModelAdmin):
+    
+    change_list_template = "admin/report_term.html"
+
+    def has_add_permission(self, request):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
         extra_context.update({
             "academic_year": AcademicYear.objects.all(),
             "term": Term.objects.all(),
@@ -170,212 +230,92 @@ class ProgressReportsAdmin(admin.ModelAdmin):
             "exams": ExamsCategory.objects.all(),
             "subjects": Subject.objects.all(),
             "assessments": Assessment.objects.all(),
-            "grades": GradeScale.objects.all(),
+             "grades": GradeScale.objects.all(),
+            
             "title": "Filter student to",
         })
 
         if request.method == "POST":
-            reg_number = request.POST.get("reg_number")
             academic_year = request.POST.get("academic_year")
             term = request.POST.get("term")
+            new_class = request.POST.get("new_class")
+            stream = request.POST.get("stream")
+          
             
+            # print('#######################################', academic_year,term,new_class,stream)
+
+            filtered_students = StudentRegistration.objects.filter(
+                entry_year_id=academic_year,
+                entry_term_id=term,
+                entry_class_id=new_class,
+                stream_name_id=stream,
             
-   
-            filtered_students2 = StudentRegistration.objects.filter(registration_number=reg_number
-             )
-            filtered_students = Result.objects.filter(
-                academic_year=academic_year,
-                registration_number=reg_number,
-                term=term,
-                )
-            
+            )
+             
+
             if not filtered_students.exists():
-                extra_context["error_message"] = "No Students with Registration Number, selected Academic year and term."
+                extra_context["error_message"] = "No data found for the selected Category." 
                 return super().changelist_view(request, extra_context=extra_context)
             else:
+                # If students are found, pass them to the template
+                extra_context["selected_academic_year"] = AcademicYear.objects.get(id=academic_year).name
+                extra_context["selected_term"] = Term.objects.get(id=term).name
+                extra_context["selected_programme"] = Programme.objects.get(id=programme).name
+                extra_context["selected_class"] = Class.objects.get(id=new_class).class_name
+                extra_context["selected_stream"] = Stream.objects.get(id=stream).name
                 extra_context["filtered_students"] = filtered_students
-                extra_context["filtered_students2"] = filtered_students2
-
-            pdf = self.generate_pdf(filtered_students, filtered_students2, logo_url,academic_year,term, profile_image)
-
-
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="Student_progress_report.pdf"'
-            return response
-
-        return super().changelist_view(request, extra_context=extra_context)
-        
-    def generate_pdf(self, filtered_data, filtered_data_2, logo_url,academic_year,term,profile_image): 
-        date = timezone.now().strftime('%d-%m-%Y')
-
-        # Extract student details from filtered_students2
-        student_info = filtered_data_2.first()  # Assuming only one student is filtered
-
-        student_details = {
-            
-            'name': f"{student_info.first_name} {student_info.last_name}" if student_info else "N/A",
-            'registration_no': student_info.registration_number if student_info else "N/A",
-            'sex': student_info.gender if student_info else "N/A",
-            'birth_date': student_info.birth_date.strftime('%d-%m-%Y') if student_info.birth_date else "N/A",
-            'admission_date': student_info.admission_date.strftime('%d-%m-%Y') if student_info.admission_date else "N/A",
-            'programme': student_info.entry_programme.name if student_info.entry_programme else "N/A",
-            'class_name': student_info.entry_class if student_info else "N/A"
-        }
-        
-        # Prepare results
-        results = []
-        total_average = 0
-        total_subjects = filtered_data.count()
-        
-        for i, result in enumerate(filtered_data, start=1):
-            results.append({
-                'sn': i,
-                'subject_name': result.subject,
-                'total': result.total,
-                'average': result.avg,
-                'remark': result.point,
-                'grade': result.grade,
-                'position': result.division,
-              
-            })
-            total_average += result.avg if result.avg is not None else 0
-
-        overall_average = total_average / total_subjects if total_subjects > 0 else 0
-        overall_position = filtered_data_2.first().registration_number if filtered_data_2.exists() else "N/A"
-
-        # Render the HTML with student details and results
-        html_content = render_to_string('admin/students_details.html', {
-            'data': filtered_data,
-            'student_details': student_details,
-            'results': results,
-            'overall_average': overall_average,
-            'overall_position': overall_position,
-            'logo_url': logo_url,
-            'profile_image': profile_image,
-            'date': date,
-            'academic_year': academic_year,
-             'term': term,
-        })
-        pdf = weasyprint.HTML(string=html_content).write_pdf()
-        return pdf
-
-    def has_add_permission(self, request):
-        return False
-
-@admin.register(TermReports)
-class TermReports(admin.ModelAdmin):
-    
-    change_list_template = "admin/report_term.html"
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        logo_url = request.build_absolute_uri(static('logo_.png'))
-        extra_context.update({
-            "academic_year": AcademicYear.objects.all(),
-            "academic_year": AcademicYear.objects.all(),
-            "terms": Term.objects.all(),
-            "programmes": Programme.objects.all(),
-            "classes": Class.objects.all(),
-            "streams": Stream.objects.all(),
-            "exams": ExamsCategory.objects.all(),
-            "subjects": Subject.objects.all(),
-            "assessments": Assessment.objects.all(),
-            "grades": GradeScale.objects.all(),
-            "title": "Term report",
-            "logo_url": logo_url # Adjust this line
-           
-        })
-
-        
-        if request.method == 'POST':
-            
-            academic_year_name = request.POST.get('academic_year_name_')
-            
-            academic_term = request.POST.get('academic_term')
-             
-            academic_class = request.POST.get('class')
-            
-            academic_stream = request.POST.get('stream')
-            
-           
-          
-
-            filtered_data = Result.objects.filter(academic_year=academic_year_name)
-            filtered_data_2 = ResultSummary.objects.filter(academic_year=academic_year_name)
-            
-          
-    
-        
-            if not filtered_data.exists():
+                extra_context["filtered_students"] = filtered_students
                
-                extra_context["error_message"] = "No data found for the selected academic year." 
-                return super().changelist_view(request, extra_context=extra_context)
-
-           
-            pdf = self.generate_pdf(filtered_data,filtered_data_2,logo_url,academic_year_name)
-            
-          
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="term_report.pdf"'
-            return response
+            return render(request, "admin/students_progresddddds.html", extra_context) 
+            # return super().changelist_view(request, extra_context=extra_context)
+        
 
         return super().changelist_view(request, extra_context=extra_context)
 
-    def generate_pdf(self, filtered_data,filtered_data_2, logo_url,academic_year_name): 
-        date = timezone.now().strftime('%d-%m-%Y')
-        html_content = render_to_string('admin/term_report_.html', {'data': filtered_data,'data2':filtered_data_2,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
-        pdf = weasyprint.HTML(string=html_content).write_pdf()
-        return pdf
-      
-
-    def has_add_permission(self, request):
-        return False
-
-    
     
  ##################################################################### INLINE EDIT FIELDS #########################################################################   
     
-# from django.contrib import admin
-# from .models import StudentAssessment
+from django.contrib import admin
+from .models import StudentAssessment
 
 
 # @admin.register(StudentAssessment)
-# class StudentAssessmentAdmin(admin.ModelAdmin):
-#     # Fields to display in the admin list view
-#     list_display = (
-#         'academic_year', 
-#         'term', 
-#         'programme', 
-#         'student_class', 
-#         'registration_number', 
-#         'first_name', 
-#         'last_name', 
-#         'assessment', 
-#         'assessment_grade'
-#     )
+class StudentAssessmentAdmin(admin.ModelAdmin):
+    # Fields to display in the admin list view
+    list_display = (
+        'academic_year', 
+        'term', 
+        'programme', 
+        'student_class', 
+        'registration_number', 
+        'first_name', 
+        'last_name', 
+        'assessment', 
+        'assessment_grade'
+    )
     
-#     # Fields to search for in the admin search bar
-#     search_fields = (
-#         'registration_number', 
-#         'first_name', 
-#         'last_name', 
-#         'assessment'
-#     )
+    # Fields to search for in the admin search bar
+    search_fields = (
+        'registration_number', 
+        'first_name', 
+        'last_name', 
+        'assessment'
+    )
     
-#     # Filters to narrow down results in the admin interface
-#     list_filter = (
-#         'academic_year', 
-#         'term', 
-#         'programme', 
-#         'student_class', 
-#         'assessment_grade'
-#     )
+    # Filters to narrow down results in the admin interface
+    list_filter = (
+        'academic_year', 
+        'term', 
+        'programme', 
+        'student_class', 
+        'assessment_grade'
+    )
     
-#     # Fields that can be edited directly from the list view
-#     list_editable = ('assessment_grade',)
+    # Fields that can be edited directly from the list view
+    list_editable = ('assessment_grade',)
     
-#     # Sets how many entries to show per page
-#     list_per_page = 20
+    # Sets how many entries to show per page
+    list_per_page = 20
 
     
     
@@ -387,35 +327,35 @@ from django.contrib import admin
 from .models import StudentAssessment, GradeScale
 
 
-# @admin.register(StudentAssessment)
-class StudentAssessmentAdmin(admin.ModelAdmin):
-    list_display = (
-        'academic_year', 
-        'term', 
-        'programme', 
-        'student_class', 
-        'registration_number', 
-        'first_name', 
-        'last_name', 
-        'assessment', 
-        'assessment_grade',
-    )
-    search_fields = (
-        'registration_number', 
-        'first_name', 
-        'last_name', 
-        'assessment'
-    )
-    list_filter = (
-        'academic_year', 
-        'term', 
-        'programme', 
-        'student_class', 
-        'assessment_grade'
-    )
-    # Make assessment_grade editable as a dropdown
-    list_editable = ('assessment_grade',)
-    list_per_page = 20
+# # @admin.register(StudentAssessment)
+# class StudentAssessmentAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'academic_year', 
+#         'term', 
+#         'programme', 
+#         'student_class', 
+#         'registration_number', 
+#         'first_name', 
+#         'last_name', 
+#         'assessment', 
+#         'assessment_grade',
+#     )
+#     search_fields = (
+#         'registration_number', 
+#         'first_name', 
+#         'last_name', 
+#         'assessment'
+#     )
+#     list_filter = (
+#         'academic_year', 
+#         'term', 
+#         'programme', 
+#         'student_class', 
+#         'assessment_grade'
+#     )
+#     # Make assessment_grade editable as a dropdown
+#     list_editable = ('assessment_grade',)
+#     list_per_page = 20
 
     
 ################################################################ end DROPDOWN EDIT ################################################################################
@@ -453,24 +393,23 @@ class ClassListReports(admin.ModelAdmin):
              
             academic_class = request.POST.get('class')
             
-            academic_stream = request.POST.get('stream')
-            
+            student_results = StudentsResult.objects.filter(
+             entry_term=academic_term,
+             entry_class=academic_class,
            
+            )
+             
           
-
-            filtered_data = Result.objects.filter(academic_year=academic_year_name)
-            filtered_data_2 = ResultSummary.objects.filter(academic_year=academic_year_name)
-            
           
     
         
-            if not filtered_data.exists():
+            if not student_results.exists():
                
                 extra_context["error_message"] = "No data found for the selected academic year." 
                 return super().changelist_view(request, extra_context=extra_context)
 
            
-            pdf = self.generate_pdf(filtered_data,filtered_data_2,logo_url,academic_year_name)
+            pdf = self.generate_pdf(student_results,logo_url,academic_class)
             
           
             response = HttpResponse(pdf, content_type='application/pdf')
@@ -479,9 +418,9 @@ class ClassListReports(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-    def generate_pdf(self, filtered_data,filtered_data_2, logo_url,academic_year_name): 
+    def generate_pdf(self,student_results, logo_url,academic_class): 
         date = timezone.now().strftime('%d-%m-%Y')
-        html_content = render_to_string('admin/class_rpt.html', {'data': filtered_data,'data2':filtered_data_2,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
+        html_content = render_to_string('admin/class_rpt.html', {'class_name':academic_class,'data':student_results,'logo_url': logo_url,'date':date})
         pdf = weasyprint.HTML(string=html_content).write_pdf()
         return pdf
       
@@ -490,11 +429,67 @@ class ClassListReports(admin.ModelAdmin):
         return False
 
     
-# @admin.register(SubjectReports)
+@admin.register(SubjectReports)
 class SubjectReports(admin.ModelAdmin):
-   
+    change_list_template = "admin/subject_report_.html"
+        
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        logo_url = request.build_absolute_uri(static('logo_.png'))
+        extra_context.update({
+            "academic_year": AcademicYear.objects.all(),
+            "academic_year": AcademicYear.objects.all(),
+            "terms": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "streams": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "assessments": Assessment.objects.all(),
+            "grades": GradeScale.objects.all(),
+            "title": "Term report",
+            "logo_url": logo_url # Adjust this line
+           
+        })
+
+        
+        if request.method == 'POST':
+            
+            academic_year_name = request.POST.get('academic_year_name_')
+            
+            academic_term = request.POST.get('academic_term')
+             
+            subject_name = request.POST.get('subject_name')
+             
+            student_results = StudentsResult.objects.filter(
+             entry_term=academic_term,
+             subject=subject_name,
+           
+            )
+             
+        
+        
+            if not student_results.exists():
+               
+                extra_context["error_message"] = "No data found for the selected academic year." 
+                return super().changelist_view(request, extra_context=extra_context)
+
+           
+            pdf = self.generate_pdf(student_results,logo_url,subject_name)
+            
+          
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="class_report.pdf"'
+            return response
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def generate_pdf(self,student_results, logo_url,subject_name): 
+        date = timezone.now().strftime('%d-%m-%Y')
+        html_content = render_to_string('admin/class_rpt.html', {'class_name':subject_name,'data':student_results,'logo_url': logo_url,'date':date})
+        pdf = weasyprint.HTML(string=html_content).write_pdf()
+        return pdf
+      
 
     def has_add_permission(self, request):
         return False
-    
-    

@@ -80,18 +80,21 @@
     </style>
 </head>
 <body>
-    <div class="header">
-
+    <div style="display: flex; align-items: center; padding: 5px;">
         {% load static %}
-        <img src="{{ logo_url }}" alt="" style="height: 120px;">
-        <h1>KONDOA GIRLS SECONDARY SCHOOL <br><small>example.com | Phone: (123) 456-7890</small></h1>
-       
+        <!-- Logo on the left -->
+        <div style="flex: 0 0 auto;">
+            <img src="{{ logo_url }}" alt="School Logo" style="height: 100px;">
+        </div>
+        <!-- Title in the center -->
+        <div style="flex: 1; text-align: center;">
+            <h2 style="margin: 0;">KONDOA GIRLS SECONDARY SCHOOL</h2>
+            <small style="display: block;">P.O Box 193 Kondoa | Mobile: (255) 713448417</small>
+            <small style="display: block;">Email: kondoagirls@gmail.com</small>
+            <h2 style="margin-top: 20px;"><small>ANNUAL REPORT {{ academic_year }}</small></h2>
+        </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; width: 100%;">
-        <label style="padding-left:10px"><b>Annual Report: {{academic_year}}</b></label>
-        <label  style="padding-right:10px"><b>Date: {{date}}</b></label>
-    </div>
     <hr style="flex-grow: 10; margin: 0 10px;width=100%">
     <hr style="flex-grow: 20; margin: 0 10px;width=100%">
     

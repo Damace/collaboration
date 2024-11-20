@@ -41,7 +41,7 @@
 <form method="post" class="forms-sample mt-4">
   {% csrf_token %}
   <fieldset>
-    <legend style="font-size: 1.5em; color: #000000;"><small>Class Report</small></legend>
+    <legend style="font-size: 1.5em; color: #000000;"><small>Subject Report</small></legend>
 
     
 {% if error_message %}
@@ -87,12 +87,12 @@
               </td>
           </tr>
           <tr>
-              <td style="float:right"> <label for="class_name">Class <span class="text-danger">*</span></label></td>
+              <td style="float:right"> <label for="class_name">Subject <span class="text-danger">*</span></label></td>
               <td>
-                  <select name="class" id="class_name" class="form-control" required>
+                  <select name="subject_name" id="class_name" class="form-control" required>
                       <option value="0">-- Select --</option>
-                      {% for class in classes %}
-                          <option value="{{ class.class_name }}">{{ class.class_name }}</option>
+                      {% for subject in subjects %}
+                          <option value="{{ subject.subject_name }}">{{ subject.subject_name }}</option>
                       {% empty %}
                           <option disabled>No academic years available</option>
                       {% endfor %}

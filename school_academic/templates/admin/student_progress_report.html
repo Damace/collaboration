@@ -41,12 +41,6 @@
     </style>
 </head>
 <body>
-
-
-   
-
-
-<span>Get Students Progress Report </span>
 <table> 
     <thead>
         <tr>
@@ -70,49 +64,78 @@
     </script>
   {% endif %}
 
-    <form method="post" class="forms-sample">
-      {% csrf_token %}
-
- 
-    <tbody>
-        <tr>
-            <td style="float:right"><label for="academic_year">Enter Registration number<span style="color:red">*</span></label></td>
-            <td> <input type="text" name ="reg_number" class="form-control"></td>
-        </tr>
-
+  <form method="post" class="forms-sample">
+    {% csrf_token %}
+    
+    <fieldset>
+      <legend>Results progress report</legend> <!-- Add your legend here -->
+      
+      <tbody>
+    
+  
         <tr>
           <td style="float:right"><label for="academic_year">Academic Year <span style="color:red">*</span></label></td>
-          <td> <select name="academic_year" id="academic_year" required class="form-control">
-            <option value="">-- Select --</option>
-            {% for year in academic_year %}
-              <option value="{{ year.name }}">{{ year.name }}</option>
-            {% empty %}
-              <option disabled>No academic years available</option>
-            {% endfor %}
-          </select></td>
-      </tr>
-      <tr>
-          <td style="float:right"><label for="term">Term <span style="color:red">*</span></label>
+          <td>
+            <select name="academic_year" id="academic_year" required class="form-control">
+              <option value="">-- Select --</option>
+              {% for year in academic_year %}
+                <option value="{{ year.id }}">{{ year.name }}</option>
+              {% empty %}
+                <option disabled>No academic years available</option>
+              {% endfor %}
+            </select>
           </td>
-          <td> <select name="term" id="term" required  class="form-control">
-            <option value="">-- Select --</option>
-            {% for t in term %}
-              <option value="{{ t.name}}">{{ t.name }}</option>
-            {% empty %}
-              <option disabled>No terms available</option>
-            {% endfor %}
-          </select></td>
-      </tr>
-      
-
-
+        </tr>
 
         <tr>
-             <td></td>
-            <td style="float:right">  <button type="submit" class="btn btn-primary">Get Results</button></td>
+          <td style="float:right"><label for="term">Term <span style="color:red">*</span></label></td>
+          <td>
+            <select name="term_name" id="term" required class="form-control">
+              <option value="">-- Select --</option>
+              {% for t in term %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+              {% empty %}
+                <option disabled>No terms available</option>
+              {% endfor %}
+            </select>
+          </td>
         </tr>
-    </tbody>
+
+        <tr>
+          <td style="float:right"><label for="academic_year">Class / Form<span style="color:red">*</span></label></td>
+          <td>
+            <select name="class_name" id="academic_year" required class="form-control">
+              <option value="">-- Select --</option>
+              {% for class in classes %}
+                <option value="{{ class.id}}">{{ class.class_name }}</option>
+              {% empty %}
+                <option disabled>No academic years available</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="float:right"><label for="academic_year">Stream<span style="color:red">*</span></label></td>
+          <td>
+            <select name="stream_name" id="stream_name" required class="form-control">
+              <option value="">-- Select --</option>
+              {% for stream in streams %}
+                <option value="{{ stream.id }}">{{ stream.name }}</option>
+              {% empty %}
+                <option disabled>No academic years available</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="float:right"><button type="submit" class="btn btn-primary">Get Results</button></td>
+        </tr>
+      </tbody>
+    </fieldset>
   </form>
+
 </table>
 
 </body>

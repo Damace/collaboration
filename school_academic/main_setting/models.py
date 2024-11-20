@@ -201,4 +201,3 @@ class Contact(models.Model):
         return f"{self.email} - {self.phone_number}"
 
 
-
