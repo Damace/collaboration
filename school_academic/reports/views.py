@@ -72,7 +72,7 @@ def download_assessment(request, registration_number, academic_year, term):
             'sex': student_info.gender if student_info else "N/A",
             'birth_date': student_info.birth_date.strftime('%d-%m-%Y') if student_info.birth_date else "N/A",
             'admission_date': student_info.admission_date.strftime('%d-%m-%Y') if student_info.admission_date else "N/A",
-            'programme': student_info.entry_programme.name if student_info.entry_programme else "N/A",
+            'programme': student_info.stream_name if student_info.stream_name else "N/A",
             'class_name': student_info.entry_class if student_info else "N/A"
         }
     
