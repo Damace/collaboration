@@ -129,7 +129,6 @@ from django.http import JsonResponse
 from main_setting.models import Subject
 from Record_results.models import QueResults, StudentsResult
 
-
 def save_assessment(request):
     if request.method == 'POST':
         registration_number = request.POST.get('registration_number')
@@ -145,32 +144,118 @@ def save_assessment(request):
                 subject_id = key.split('_')[1]  # Extract subject ID
                 try:
                     subject = Subject.objects.get(id=subject_id)
-                    # Save data to StudentAssessment
-                    StudentsResult.objects.create(
+                    subject_code = request.POST.get(f'subject_code_{subject_id}')
+                    subject_name = request.POST.get(f'subject_name_{subject_id}')
+
+                    # Retrieve marks
+                    mt3 = float(request.POST.get(f'mt3_{subject_id}', 0) or 0)
+                    mt4 = float(request.POST.get(f'mt4_{subject_id}', 0) or 0)
+                    mte2 = float(request.POST.get(f'mte2_{subject_id}', 0) or 0)
+                    ae = float(request.POST.get(f'ae_{subject_id}', 0) or 0)
+                    hpbt1 = float(request.POST.get(f'hpbt1_{subject_id}', 0) or 0)
+                    hpbt2 = float(request.POST.get(f'hpbt2_{subject_id}', 0) or 0)
+                    hpbt3 = float(request.POST.get(f'hpbt3_{subject_id}', 0) or 0)
+
+                    # Calculate average only for the current subject
+                    average = (mt3 + mt4 + mte2 + ae + hpbt1 + hpbt2 + hpbt3) / 7
+
+                    # Determine grade and remark
+                    if average >= 90:
+                        grade = 'A'
+                        remark = 'EXCELLENT'
+                    elif average >= 80:
+                        grade = 'B'
+                        remark = 'VERY GOOD'
+                    elif average >= 70:
+                        grade = 'C'
+                        remark = 'GOOD'
+                    elif average >= 60:
+                        grade = 'D'
+                        remark = 'FAIR'
+                    elif average >= 50:
+                        grade = 'E'
+                        remark = 'PASS'
+                    elif average >= 40:
+                        grade = 'F'
+                        remark = 'FAIL'
+                    else:
+                        grade = '0'
+                        remark = 'POOR'
+
+                    # Check if the record already exists
+                    existing_result = StudentsResult.objects.filter(
                         registration_number=registration_number,
                         entry_year=entry_year,
                         entry_term=entry_term,
-                        entry_programme=entry_programme,
-                        entry_class=entry_class,
-                        stream_name=stream_name,
-                        subject=subject,
-                        full_name=request.POST.get('full_name'),
-                        mt3=request.POST.get(f'mt3_{subject_id}'),
-                        mt4=request.POST.get(f'mt4_{subject_id}'),
-                        mte2=request.POST.get(f'mte2_{subject_id}'),
-                        ae=request.POST.get(f'ae_{subject_id}'),
-                        hpbt1=request.POST.get(f'hpbt1_{subject_id}'),
-                        hpbt2=request.POST.get(f'hpbt2_{subject_id}'),
-                        hpbt3=request.POST.get(f'hpbt3_{subject_id}'),
-                        average=request.POST.get(f'average_{subject_id}'),
-                        grade=request.POST.get(f'grade_{subject_id}'),
-                        remark=request.POST.get(f'remark_{subject_id}'),
-                        position=request.POST.get(f'position_{subject_id}')
-                    )
+                        subject_code=subject_code,
+                        subject_name=subject_name
+                    ).first()
+
+                    if existing_result:
+                        # Update only the score fields that are provided in the POST request
+                        if request.POST.get('full_name'):
+                            existing_result.full_name = request.POST.get('full_name')
+
+                        # Update marks only if provided
+                        existing_result.mt3 = mt3 if request.POST.get(f'mt3_{subject_id}') else existing_result.mt3
+                        existing_result.mt4 = mt4 if request.POST.get(f'mt4_{subject_id}') else existing_result.mt4
+                        existing_result.mte2 = mte2 if request.POST.get(f'mte2_{subject_id}') else existing_result.mte2
+                        existing_result.ae = ae if request.POST.get(f'ae_{subject_id}') else existing_result.ae
+                        existing_result.hpbt1 = hpbt1 if request.POST.get(f'hpbt1_{subject_id}') else existing_result.hpbt1
+                        existing_result.hpbt2 = hpbt2 if request.POST.get(f'hpbt2_{subject_id}') else existing_result.hpbt2
+                        existing_result.hpbt3 = hpbt3 if request.POST.get(f'hpbt3_{subject_id}') else existing_result.hpbt3
+
+                        # Only update the average, grade, and remark if scores have changed
+                        if any([
+                            existing_result.mt3 != mt3,
+                            existing_result.mt4 != mt4,
+                            existing_result.mte2 != mte2,
+                            existing_result.ae != ae,
+                            existing_result.hpbt1 != hpbt1,
+                            existing_result.hpbt2 != hpbt2,
+                            existing_result.hpbt3 != hpbt3
+                        ]):
+                            existing_result.average = average
+                            existing_result.grade = grade
+                            existing_result.remark = remark
+                            # Calculate position based on the current subject's scores
+                            position = StudentsResult.objects.filter(
+                                subject_code=subject_code,
+                                subject_name=subject_name,
+                                average__gt=average
+                            ).count() + 1  # Position is 1 plus the count of students with higher averages
+                            existing_result.position = position
+
+                        existing_result.save()  # Save the updated record
+
+                    else:
+                        # Create new record if it doesn't exist
+                        StudentsResult.objects.create(
+                            registration_number=registration_number,
+                            entry_year=entry_year,
+                            entry_term=entry_term,
+                            entry_programme=entry_programme,
+                            entry_class=entry_class,
+                            stream_name=stream_name,
+                            subject_code=subject_code,
+                            subject_name=subject_name,
+                            full_name=request.POST.get('full_name'),
+                            mt3=mt3,
+                            mt4=mt4,
+                            mte2=mte2,
+                            ae=ae,
+                            hpbt1=hpbt1,
+                            hpbt2=hpbt2,
+                            hpbt3=hpbt3,
+                            average=average,
+                            grade=grade,
+                            remark=remark,
+                        )
+
                 except Subject.DoesNotExist:
-                    continue  # Skip subjects that don't exist
+                    continue 
 
-        messages.success(request, "Results added successfully!")
-        return redirect('admin:index')  # Redirect to the admin homepage 
-
+        messages.success(request, "Results processed successfully!")
+        return redirect('admin:index')  # Redirect to the admin homepage
+    # Redirect to the admin homepage  # Redirect to the admin homepage # Redirect to the admin homepage # Redirect to the admin homepage
     return JsonResponse({'error': 'Invalid request'}, status=400)

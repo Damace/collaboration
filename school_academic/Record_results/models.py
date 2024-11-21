@@ -61,7 +61,8 @@ class StudentsResult(models.Model):
     entry_class = models.CharField(max_length=50)
     stream_name = models.CharField(max_length=50)
     full_name = models.CharField(max_length=100)
-    subject = models.CharField(max_length=100)
+    subject_code = models.CharField(max_length=100)
+    subject_name = models.CharField(max_length=100)
     mt3 = models.FloatField()
     mt4 = models.FloatField()
     mte2 = models.FloatField()
@@ -75,6 +76,6 @@ class StudentsResult(models.Model):
     position = models.IntegerField()
     
     def __str__(self):
-        return f"{self.full_name} - {self.subject} ({self.academic_year} - {self.term})"
+        return f"{self.full_name} - {self.subject_name} ({self.academic_year} - {self.term})"
 
 
