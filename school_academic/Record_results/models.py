@@ -82,8 +82,12 @@ class StudentsResult(models.Model):
     remark = models.CharField(max_length=100)
     position = models.IntegerField()
     
+    class Meta:
+        verbose_name = "Edit Results"
+        verbose_name_plural = "Edit Results"
+    
     def __str__(self):
-        return f"{self.full_name} - {self.subject_name} ({self.academic_year} - {self.term})"
+        return f"{self.full_name} - {self.subject_name}"
     
     
     

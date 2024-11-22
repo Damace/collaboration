@@ -10,48 +10,134 @@ from exam_setting.models import ExamsCategory, GradeDivision, GradeScale
 from reports.models import StudentAssessment
 from results.models import Result
 
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.db import transaction
 
-
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.db import transaction
+from .models import StudentsResult, GradeScale
+import random
 
 def add_results_view(request):
     if request.method == 'POST':
-        # Get the selected criteria from the form
+       
         academic_year = request.POST.get('selected_academic_year')
         term = request.POST.get('selected_term')
         programme = request.POST.get('selected_programme')
+        selected_stream = request.POST.get('selected_stream')
         selected_class = request.POST.get('selected_class')
+        subject_code = request.POST.get('selected_subject_code')
         subject = request.POST.get('selected_subject')
         exam_type = request.POST.get('selected_exams')
         
-       
         
-     
-        # Process each selected student
-        selected_students = request.POST.getlist('selected_students')
-        for student_id in selected_students:
-            registration_number = request.POST.get(f'student_registration_number_{student_id}')
-            first_name = request.POST.get(f'student_first_name_{student_id}')
-            last_name = request.POST.get(f'student_last_name_{student_id}')
-            subject_result = request.POST.get(f'result_{student_id}')
-            
-            # Insert into QueResults model
-            QueResults.objects.create(
-                academic_year=academic_year,
-                term=term,
-                programme=programme,
-                class_name=selected_class,
-                # stream=stream_name,
-                registration_number=registration_number,
-                student_name = f'{first_name} {last_name}',
-                exam_type=exam_type,
-                subject=subject,
-                result=subject_result,
-                result_summary = f'{subject}={subject_result}',
-                
-            )
+       
 
-        messages.success(request, "Results added successfully!")
-        return redirect('admin:index')  # Redirect to the admin homepage 
+        # Get selected students
+        selected_students = request.POST.getlist('selected_students')
+        
+        
+        
+        
+        try:
+            with transaction.atomic():  # Ensure atomic database transactions
+                for student_id in selected_students:
+                    # Retrieve student-specific data
+                    registration_number = request.POST.get(f'student_registration_number_{student_id}')
+                    first_name = request.POST.get(f'student_first_name_{student_id}')
+                    last_name = request.POST.get(f'student_last_name_{student_id}')
+                    subject_result = float(request.POST.get(f'result_{student_id}', 0) or 0)
+                    
+                
+                    # Initialize all score fields
+                    mt3 = mt4 = mte2 = ae = hpbt1 = hpbt2 = hpbt3 = 0
+      
+                    if exam_type == 'ANNUAL EST':
+                        ae = subject_result
+                    elif exam_type == 'MT3':
+                        mt3 = subject_result
+                    elif exam_type == 'MT4':
+                        mt4 = subject_result
+                    elif exam_type == 'MTE2':
+                        mte2 = subject_result
+                    elif exam_type == 'HPBT1':
+                        hpbt1 = subject_result
+                    elif exam_type == 'HPBT2':
+                        hpbt2 = subject_result
+                    elif exam_type == 'HPBT3':
+                        hpbt3 = subject_result
+                    
+                                            
+                        total = 0
+                        average = 0
+                   
+                    values = [mt3, mt4, mte2, ae, hpbt1, hpbt2, hpbt3]
+                    valid_values = [value for value in values if value not in (None, 0)]
+                    if valid_values:
+                           total = sum(valid_values)
+                           average = total / len(valid_values)
+                      
+                    if 80 <= subject_result <= 100:
+                            grade = 'A'
+                            remark = 'Excellent'
+                    elif 70 <= subject_result < 79:
+                            grade = 'B' 
+                            remark = 'Very good'    
+                    elif 60 <= subject_result < 69:
+                            grade = 'C'
+                            remark = 'Good'  
+                    elif 50 <= subject_result < 59:
+                            grade = 'D'
+                            remark = 'Average'
+                            
+                    elif 40 <= subject_result < 49:
+                            grade = 'D'
+                            remark = 'Satisfactory'  
+                    else:
+                            grade = 'F'
+                            remark = 'Fail' 
+
+
+                    # Create a new student result entry
+                    student_result = StudentsResult.objects.create(
+                        registration_number=registration_number,
+                        entry_year=academic_year,
+                        entry_term=term,
+                        entry_programme=programme,
+                        entry_class=selected_class,
+                        stream_name=selected_stream,
+                        full_name=f"{first_name} {last_name}",
+                        subject_code=subject_code,
+                        subject_name=subject,
+                        mt3=mt3,
+                        mt4=mt4,
+                        mte2=mte2,
+                        ae=ae,
+                        hpbt1=hpbt1,
+                        hpbt2=hpbt2,
+                        hpbt3=hpbt3,
+                        average=average,
+                        grade=grade,
+                        remark=remark,
+                        position=random.uniform(1, 100),
+                    )
+                    student_result.save()
+                    
+
+            messages.success(request, "Results added successfully!")
+            return redirect('admin:index')  # Redirect to the admin homepage
+
+        except Exception as e:
+            messages.error(request, f"Error adding results: {str(e)}")
+            return redirect('admin:index')  # Redirect back to the results form
+
+    else:
+        messages.error(request, "Invalid request method.")
+        return redirect('admin:index')  # Redirect back if not POST
+
+ 
 
 
 from django.shortcuts import redirect

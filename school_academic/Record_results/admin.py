@@ -71,6 +71,7 @@ class StudentsProxyAdmin(admin.ModelAdmin):
                 extra_context["selected_class"] = Class.objects.get(id=new_class).class_name
                 extra_context["selected_stream"] = Stream.objects.get(id=stream).name
                 extra_context["selected_subject"] = Subject.objects.get(id=subject).subject_name
+                extra_context["selected_subject_code"] = Subject.objects.get(id=subject).subject_code
                 extra_context["filtered_students"] = filtered_students
                 extra_context["subject"] = subject
                 extra_context["selected_exams"] =  exam
@@ -87,7 +88,7 @@ class StudentsProxyAdmin(admin.ModelAdmin):
     #   return render(request, 'addresults.html', {'filtered_students': filtered_students})
 
 
-# admin.site.register(StudentsProxy, StudentsProxyAdmin)
+admin.site.register(StudentsProxy, StudentsProxyAdmin)
 
 
 from django.contrib import admin
@@ -317,7 +318,7 @@ class StudentsresultsProxyAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
    
-admin.site.register(StudentsresultsProxy, StudentsresultsProxyAdmin)
+# admin.site.register(StudentsresultsProxy, StudentsresultsProxyAdmin)
 
 
 
@@ -402,7 +403,48 @@ class StudentsResultQueAdmin(admin.ModelAdmin):
 # admin.site.register(StudentsResultQue, StudentsResultQueAdmin)
 
 
+from django.contrib import admin
+from .models import StudentsResult
 
+class StudentsResultAdmin(admin.ModelAdmin):
+    
+    def has_add_permission(self, request):
+        return False
+    
+    # Display fields in the admin list view
+    list_display = ('registration_number', 'full_name','subject_code', 'subject_name','mt3', 'mt4', 'mte2', 'ae', 'hpbt1', 'hpbt2')
+    
+    # Search functionality
+    search_fields = ('registration_number', 'full_name', 'subject_name')
+    
+    # Filtering options for the admin panel
+    list_filter = ('entry_year', 'entry_term', 'entry_programme', 'entry_class', 'stream_name', 'grade')
+
+    # Fieldsets for organizing fields in the admin form
+    fieldsets = (
+        (None, {
+            'fields': ('registration_number', 'full_name','subject_code', 'subject_name')
+        }),
+        ('Exams Results', {
+            'fields': ('mt3', 'mt4', 'mte2', 'ae', 'hpbt1', 'hpbt2', 'hpbt3', 'average', 'grade', 'remark'),
+        }),
+        ('Position', {
+            'fields': ('position',),
+        }),
+        ('Meta Info', {
+            'fields': ('entry_year', 'entry_term', 'entry_programme', 'entry_class', 'stream_name'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    # Making fields editable from the list view for quick editing
+    list_editable = ('mt3', 'mt4', 'mte2', 'ae', 'hpbt1', 'hpbt2')
+
+    # Allow for inlines and customization as needed
+    # You can also add actions like 'bulk update' or 'bulk delete' here.
+
+# Register the model with the admin interface
+admin.site.register(StudentsResult, StudentsResultAdmin)
 
 
 

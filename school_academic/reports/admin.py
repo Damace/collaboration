@@ -45,12 +45,14 @@ class AnnualReports(admin.ModelAdmin):
             academic_year_name = request.POST.get('academic_year_name')
             
           
-
-            filtered_data = Result.objects.filter(academic_year=academic_year_name)
-            filtered_data_2 = ResultSummary.objects.filter(academic_year=academic_year_name)
-            
-            print('#########################',filtered_data_2)
           
+            filtered_data= StudentsResult.objects.filter(
+             entry_year=academic_year_name,  
+            
+           
+            )
+             
+
         
             if not filtered_data.exists():
                
@@ -58,7 +60,7 @@ class AnnualReports(admin.ModelAdmin):
                 return super().changelist_view(request, extra_context=extra_context)
 
            
-            pdf = self.generate_pdf(filtered_data,filtered_data_2,logo_url,academic_year_name)
+            pdf = self.generate_pdf(filtered_data,logo_url,academic_year_name)
             
           
             response = HttpResponse(pdf, content_type='application/pdf')
@@ -67,9 +69,9 @@ class AnnualReports(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-    def generate_pdf(self, filtered_data,filtered_data_2, logo_url,academic_year_name): 
+    def generate_pdf(self, filtered_data, logo_url,academic_year_name): 
         date = timezone.now().strftime('%d-%m-%Y')
-        html_content = render_to_string('admin/report_annual_.html', {'data': filtered_data,'data2':filtered_data_2,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
+        html_content = render_to_string('admin/report_annual_.html', {'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
         pdf = weasyprint.HTML(string=html_content).write_pdf()
         return pdf
       
@@ -189,6 +191,7 @@ class ProgressReportsAdmin(admin.ModelAdmin):
                 stream_name_id=stream,
             
             )
+            
              
 
             if not filtered_students.exists():
@@ -394,6 +397,7 @@ class ClassListReports(admin.ModelAdmin):
             academic_class = request.POST.get('class')
             
             student_results = StudentsResult.objects.filter(
+             entry_year=academic_year_name,  
              entry_term=academic_term,
              entry_class=academic_class,
            
@@ -462,8 +466,9 @@ class SubjectReports(admin.ModelAdmin):
             subject_name = request.POST.get('subject_name')
              
             student_results = StudentsResult.objects.filter(
-             entry_term=academic_term,
-             subject=subject_name,
+              entry_year=academic_year_name,    
+              entry_term=academic_term,
+              subject_name=subject_name,
            
             )
              
@@ -479,14 +484,14 @@ class SubjectReports(admin.ModelAdmin):
             
           
             response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="class_report.pdf"'
+            response['Content-Disposition'] = 'attachment; filename="Subject_report.pdf"'
             return response
 
         return super().changelist_view(request, extra_context=extra_context)
 
     def generate_pdf(self,student_results, logo_url,subject_name): 
         date = timezone.now().strftime('%d-%m-%Y')
-        html_content = render_to_string('admin/class_rpt.html', {'class_name':subject_name,'data':student_results,'logo_url': logo_url,'date':date})
+        html_content = render_to_string('admin/subject_rpt.html', {'class_name':subject_name,'data':student_results,'logo_url': logo_url,'date':date})
         pdf = weasyprint.HTML(string=html_content).write_pdf()
         return pdf
       
