@@ -126,6 +126,8 @@
         </tr>
     </table>
 
+    <br><p></p>
+
 
     <h3 align="left">Result for Academic Year {{ academic_year }}    -  {{ term }} </h2>
     <table id="order-listing" class="table" width="100%">
@@ -148,7 +150,7 @@
             {% for result in student_academic_info %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ result.subject }}</td>
+                    <td>{{ result.subject_name }}</td>
                     <td>{{ result.mt3 }}</td>
                     <td>{{ result.mt4 }}</td>
                     <td>{{ result.mt2 }}</td>
@@ -172,72 +174,46 @@
             <tbody>
                 <b>
                 <tr>
-                    <td>TOTAL AVERAGE:  </td>
-                    <td>AVERAGE:  </td>
-                    <td>POSITION:  </td>
-                    <td>OUT OF:   </td>
+                    <td>TOTAL AVERAGE: {{total_average}} </td>
+                    <td>AVERAGE: {{average}}  </td>
+                    <td>POSITION:  {{position}} </td>
+                    <td>OUT OF: {{outOff}}  </td>
                     <td>POINT:   </td>
                     <td>DIVISION:  </td>
                 </tr>
             </b>
             </tbody>
         </table>
-    
-
-
-
-
-
-
-
-
-
+        <br><p></p>
     
     <h3 align="left">Character Assessment</h2>
     
-    <table>
-        <thead>
-            <tr>
-                <th>S/N</th>
-                <th>Item Name</th>
-                <th>Grade</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>HESHIMA</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>KUFAANYA KAZI KWA BIDII, JUHUDI NA MAARIFA</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>KUPENDA, KUTHAMINI NA KUELEWANA KAZI</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>KUSHIRIKI MICHEZO NA UTAMADUNI</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>KUTII KWA HIARI</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>UAMINIFU</td>
-                <td></td>
-            </tr>
-        </tbody>
+        <table>
+            <thead>
+                <tr>
+                    <th>S/N</th>
 
-       
-    </table>
+                    <th>Assessment Name</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assessment in student_assessments %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td> <!-- Serial Number -->
+                        <td>{{ assessment.assessment_name }}</td>
+                        <td>{{ assessment.grade }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align: center;">No assessments found</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <br><p></p>
+
     <h3 align="left">Grade Scale</h2>
         <table>
         
@@ -281,7 +257,7 @@
             background-color: #f9f9f9;
 
             width: 95%;
-            height: 50% 
+            height: 30% 
             padding: 8px;
 
            
@@ -299,7 +275,7 @@
 
         
     </style>
-
+    <br><p></p>
 
 
 

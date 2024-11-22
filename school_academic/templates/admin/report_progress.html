@@ -49,8 +49,7 @@
     <form method="post" class="forms-sample">
       {% csrf_token %}
       <fieldset>
-        <legend>Student assesments</legend>
- 
+        <legend>Students Assesments</legend>
 
         
     {% if error_message %}
@@ -129,33 +128,7 @@
             {% endfor %}
           </select></td>
         </tr>
-{% comment %} 
-        <tr>
-          <td style="float:right">  <label for="subject">Exam Category  <span style="color:red">*</span></label></td>
-          <td>  <select name="exam" id="subject" class="form-control"> 
-            <option value="">-- Select --</option>
-            {% for exam in exams %}
-              <option value="{{ exam.name }}">{{ exam.name }}</option>
-            {% empty %}
-              <option disabled>No subjects available</option>
-            {% endfor %}
-          </select></td>
-      </tr>
-      
 
-
-        <tr>
-          <td style="float:right">  <label for="subject">Subject  <span style="color:red">*</span></label></td>
-          <td>  <select name="subject" id="subject" class="form-control"> 
-            <option value="">-- Select --</option>
-            {% for subject in subjects %}
-              <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
-            {% empty %}
-              <option disabled>No subjects available</option>
-            {% endfor %}
-          </select></td>
-      </tr> {% endcomment %}
-      
         <tr>
              <td></td>
             <td style="float:right">  <button type="submit" class="btn btn-primary">Get Students</button></td>

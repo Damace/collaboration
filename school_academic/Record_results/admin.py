@@ -87,7 +87,7 @@ class StudentsProxyAdmin(admin.ModelAdmin):
     #   return render(request, 'addresults.html', {'filtered_students': filtered_students})
 
 
-admin.site.register(StudentsProxy, StudentsProxyAdmin)
+# admin.site.register(StudentsProxy, StudentsProxyAdmin)
 
 
 from django.contrib import admin
@@ -160,7 +160,7 @@ class ResultSummaryFilter(BaseFilter):
         return model.objects.values_list('result_summary', flat=True)
 
 
-@admin.register(QueResults)
+# @admin.register(QueResults)
 class QueResultsAdmin(admin.ModelAdmin):
     list_display = ('registration_number', 'student_name', 'class_name', 'subject', 'result')
     list_filter = (
@@ -175,6 +175,7 @@ class QueResultsAdmin(admin.ModelAdmin):
     search_fields = ('registration_number', 'student_name', 'class_name', 'subject__subject_name')
     def has_add_permission(self, request):
         return False
+
 
 
 
@@ -237,7 +238,7 @@ class StudentsAssessmentsProxyAdmin(admin.ModelAdmin):
                 extra_context["filtered_students"] = filtered_students
                 extra_context["filtered_students"] = filtered_students
                
-                return render(request, "admin/students_progress.html", extra_context) 
+                return render(request, "admin/students_assesments.html", extra_context) 
             # return super().changelist_view(request, extra_context=extra_context)
         
 
@@ -247,3 +248,164 @@ class StudentsAssessmentsProxyAdmin(admin.ModelAdmin):
 
 
 admin.site.register(StudentsAssasmentsProxy, StudentsAssessmentsProxyAdmin)
+
+
+
+from django.contrib import admin
+from .models import StudentsresultsProxy  # Import the proxy model
+from .models import StudentRegistration   # Import the original model
+
+class StudentsresultsProxyAdmin(admin.ModelAdmin):
+    
+    change_list_template = "admin/report_progress.html"
+
+    def has_add_permission(self, request):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context.update({
+            "academic_year": AcademicYear.objects.all(),
+            "term": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "stream": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "assessments": Assessment.objects.all(),
+             "grades": GradeScale.objects.all(),
+            
+            "title": "Filter student to",
+        })
+
+        if request.method == "POST":
+            academic_year = request.POST.get("academic_year")
+            term = request.POST.get("term")
+            programme = request.POST.get("programme")
+            new_class = request.POST.get("new_class")
+            stream = request.POST.get("stream")
+          
+            
+            # print('#######################################', academic_year,term,programme,new_class,stream,subject)
+
+            filtered_students = StudentRegistration.objects.filter(
+                entry_year=academic_year,
+                entry_term=term,
+                entry_programme=programme,
+                entry_class=new_class,
+                stream_name=stream,
+            
+            )
+             
+
+            if not filtered_students.exists():
+                extra_context["error_message"] = "No data found for the selected Categor." 
+                return super().changelist_view(request, extra_context=extra_context)
+            else:
+                # If students are found, pass them to the template
+                extra_context["selected_academic_year"] = AcademicYear.objects.get(id=academic_year).name
+                extra_context["selected_term"] = Term.objects.get(id=term).name
+                extra_context["selected_programme"] = Programme.objects.get(id=programme).name
+                extra_context["selected_class"] = Class.objects.get(id=new_class).class_name
+                extra_context["selected_stream"] = Stream.objects.get(id=stream).name
+                extra_context["filtered_students"] = filtered_students
+                extra_context["filtered_students"] = filtered_students
+               
+                return render(request, "admin/students_progress.html", extra_context) 
+            # return super().changelist_view(request, extra_context=extra_context)
+        
+
+        return super().changelist_view(request, extra_context=extra_context)
+   
+admin.site.register(StudentsresultsProxy, StudentsresultsProxyAdmin)
+
+
+
+from django.contrib import admin
+from .models import StudentsResultQue
+from .forms import StudentsResultQueForm  # Import the custom form
+
+class StudentsResultQueAdmin(admin.ModelAdmin):
+    list_display = (
+        # 'registration_number',
+        # 'entry_year',
+        # 'entry_term',
+        # 'entry_programme',
+        # 'entry_class',
+        # 'stream_name',
+        # 'full_name',
+       'subject_code',
+        'subject_name',
+        'mt3',          # Add editable fields here
+        'mt4',          # Add editable fields here
+        'mte2',         # Add editable fields here
+        'ae',           # Add editable fields here
+        'hpbt1',        # Add editable fields here
+        'hpbt2',        # Add editable fields here
+        # 'hpbt3',        # Add editable fields here
+        # 'average',
+        # 'grade',
+        # 'position',
+    )
+    list_filter = (
+        'entry_year',
+        'entry_term',
+        'entry_programme',
+        'entry_class',
+        'stream_name',
+        'subject_code',
+        'subject_name',
+        'full_name',
+    )
+    search_fields = ('registration_number', 'full_name', 'subject_name')
+    ordering = ('-entry_year', 'full_name')
+    list_per_page = 20
+
+    # Add the editable fields
+    list_editable = (
+        'mt3',
+        'mt4',
+        'mte2',
+        'ae',
+        'hpbt1',
+        'hpbt2',
+        # 'hpbt3',
+    )
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'registration_number',
+                'entry_year',
+                'entry_term',
+                'entry_programme',
+                'entry_class',
+                'stream_name',
+                'full_name',
+                'subject_code',
+                'subject_name',
+                'mt3',
+                'mt4',
+                'mte2',
+                'ae',
+                'hpbt1',
+                'hpbt2',
+                'hpbt3',
+                'average',
+                'grade',
+                'remark',
+                'position',
+            )
+        }),
+    )
+
+# admin.site.register(StudentsResultQue, StudentsResultQueAdmin)
+
+
+
+
+
+
+
+
+

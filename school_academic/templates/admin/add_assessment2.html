@@ -67,9 +67,10 @@
           </div>
 
           {% block content %}
-          <form id="resultForm" method="post" action="{% url 'save_assessment' %}">
+          <form method="post" action="{% url 'save_assessment2' %}">
             {% csrf_token %}
-        
+            
+            <!-- Hidden Inputs -->
             <input type="hidden" name="registration_number" value="{{ student.registration_number }}">
             <input type="hidden" name="full_name" value="{{ student.first_name }} {{ student.last_name }}">
             <input type="hidden" name="entry_year" value="{{ student.entry_year }}">
@@ -78,41 +79,40 @@
             <input type="hidden" name="entry_class" value="{{ student.entry_class }}">
             <input type="hidden" name="stream_name" value="{{ student.stream_name }}">
         
-            <h4>Add Results for {{ student.first_name }} {{ student.last_name }}</h4>
-            <p>Registration Number: {{ student.registration_number }}</p>
+            <fieldset style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+                <legend style="font-weight: bold; font-size: 1.2em;">Student Information</legend>
+                <h3>{{ student.first_name }} {{ student.last_name }}</h3>
+                <h5>Character Assessment</h5>
+                <p>Registration Number: {{ student.registration_number }}</p>
+            </fieldset>
         
-            <fieldset>
+            <fieldset style="border: 1px solid #ccc; padding: 10px;">
+                <legend style="font-weight: bold; font-size: 1.2em;">Character Assessment</legend>
                 <table border="1" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">S/n</th>
-                            <th style="width: 10%;">Subject Code</th>
-                            <th style="width: 20%;">Subject Name</th>
-                            <th style="width: 7%;">MT3</th>
-                            <th style="width: 7%;">MT4</th>
-                            <th style="width: 7%;">MTE2</th>
-                            <th style="width: 7%;">AE</th>
-                            <th style="width: 7%;">HPBT1</th>
-                            <th style="width: 7%;">HPBT2</th>
-                            <th style="width: 7%;">HPBT3</th>
+                            <th>S/n</th>
+                            <th>Character</th>
+                            <th>Grade</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for subject in subjects %}
-                        <tr>
-                            <td style="text-align: center;">{{ forloop.counter }}</td>
-                            <td style="text-align: center;">{{ subject.subject_code }}</td>
-                            <td style="text-align: left;">{{ subject.subject_name }}</td>
-                            <input type="hidden" name="subject_code_{{ subject.id }}" value="{{ subject.subject_code }}">
-                            <input type="hidden" name="subject_name_{{ subject.id }}" value="{{ subject.subject_name }}">
-                            <td><input type="text" name="mt3_{{ subject.id }}" style="width: 100%;"></td>
-                            <td><input type="text" name="mt4_{{ subject.id }}" style="width: 100%;"></td>
-                            <td><input type="text" name="mte2_{{ subject.id }}" style="width: 100%;"></td>
-                            <td><input type="text" name="ae_{{ subject.id }}" style="width: 100%;"></td>
-                            <td><input type="text" name="hpbt1_{{ subject.id }}" style="width: 100%;"></td>
-                            <td><input type="text" name="hpbt2_{{ subject.id }}" style="width: 100%;"></td>
-                            <td><input type="text" name="hpbt3_{{ subject.id }}" style="width: 100%;"></td>
-                        </tr>
+                        {% for item in extra_context.assessments %}
+                            <tr>
+                                <td style="text-align: left;">{{ forloop.counter }}</td>
+                                <td style="text-align: left;">{{ item.name }}</td>
+                        
+                                <!-- Hidden input for item name -->
+                                <td>
+                                    <input type="hidden" name="subject_name_{{ item.id }}" value="{{ item.name }}">
+                                    <!-- Dropdown for grade -->
+                                    <select name="grade_{{ item.id }}" style="width: 100%;">
+                                        {% for grade in extra_context.grades %}
+                                            <option value="{{ grade.grade_name }}">{{ grade.grade_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -120,25 +120,9 @@
         
             <br>
             <div align="right">
-                <button type="submit" class="btn btn-info">Add Results</button>
+                <button type="submit" class="btn btn-info">Save Assessment</button>
             </div>
         </form>
-        
-        <script>
-            document.getElementById("resultForm").addEventListener("submit", function (event) {
-                // Get all input fields in the form
-                const inputs = event.target.querySelectorAll("input[type='text']");
-                
-                // Loop through each input field
-                inputs.forEach((input) => {
-                    // Remove empty fields
-                    if (!input.value.trim()) {
-                        input.parentNode.removeChild(input);
-                    }
-                });
-            });
-        </script>
-        
         
 
 {% endblock %}

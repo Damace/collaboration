@@ -26,8 +26,15 @@ class StudentsProxy(StudentRegistration):
 class StudentsAssasmentsProxy(StudentRegistration):
     class Meta:
         proxy = True
-        verbose_name = "Student Assessments"
-        verbose_name_plural = "Student Assessments"
+        verbose_name = "Character assessments"
+        verbose_name_plural = "Character assessments"
+
+
+class StudentsresultsProxy(StudentRegistration):
+    class Meta:
+        proxy = True
+        verbose_name = "Students Results"
+        verbose_name_plural = "Students Results"
 
 
 
@@ -77,5 +84,48 @@ class StudentsResult(models.Model):
     
     def __str__(self):
         return f"{self.full_name} - {self.subject_name} ({self.academic_year} - {self.term})"
+    
+    
+    
+from django.db import models
+
+class StudentsResultQue(models.Model):
+    registration_number = models.CharField(max_length=50, null=True)
+    entry_year = models.CharField(max_length=20, null=True)
+    entry_term = models.CharField(max_length=20, null=True)
+    entry_programme = models.CharField(max_length=100, null=True)
+    entry_class = models.CharField(max_length=50, null=True)
+    stream_name = models.CharField(max_length=50, null=True)
+    full_name = models.CharField(max_length=100, null=True)
+    subject_code = models.CharField(max_length=100, null=True)
+    subject_name = models.CharField(max_length=100, null=True)
+    mt3 = models.FloatField(null=True)
+    mt4 = models.FloatField(null=True)
+    mte2 = models.FloatField(null=True)
+    ae = models.FloatField(null=True)
+    hpbt1 = models.FloatField(null=True)
+    hpbt2 = models.FloatField(null=True)
+    hpbt3 = models.FloatField(null=True)
+    average = models.FloatField(null=True)
+    grade = models.CharField(max_length=2, null=True)
+    remark = models.CharField(max_length=100, null=True)
+    position = models.IntegerField(null=True)
+    
+    def __str__(self):
+        return f"{self.full_name} - {self.subject_name} ({self.entry_year} - {self.entry_term})"
 
 
+class StudentAssessments(models.Model):
+    student = models.CharField(max_length=50)
+    registration_number = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=100)
+    entry_year = models.CharField(max_length=20)
+    entry_term = models.CharField(max_length=20)
+    entry_programme = models.CharField(max_length=50)
+    entry_class = models.CharField(max_length=50)
+    stream_name = models.CharField(max_length=50)
+    assessment_name = models.CharField(max_length=100)
+    grade = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.assessment_name} ({self.grade})"

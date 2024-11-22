@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from admission.models import StudentRegistration
-from Record_results.models import StudentsResult
+from Record_results.models import StudentAssessments, StudentsResult, StudentsResult
 
 def generate_report(request, student_id):
     student = StudentRegistration.objects.get(pk=student_id)
@@ -48,6 +48,8 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.templatetags.static import static
+from django.db.models import Avg
+from django.db.models import Avg, Count, Q
 
 def download_assessment(request, registration_number, academic_year, term):
     logo_url = request.build_absolute_uri(static('logo_.png'))
@@ -56,8 +58,39 @@ def download_assessment(request, registration_number, academic_year, term):
     
     student = StudentRegistration.objects.filter(registration_number=registration_number).first()
     
-    # student_results = StudentsResult.objects.filter(registration_number=registration_number).first()
     student_results = StudentsResult.objects.filter(
+        registration_number=registration_number,
+        # entry_year=academic_year,
+        entry_term=term
+    )
+    
+    total_average = StudentsResult.objects.filter(
+     registration_number=registration_number,
+     entry_term=term
+    ).aggregate(total_avg=Avg('average'))['total_avg']
+    
+    higher_avg_count = StudentsResult.objects.filter(average__gt=total_average).count()
+
+    row_count = StudentsResult.objects.filter(
+        registration_number=registration_number,entry_term=term).count()
+    
+    
+    higher_avg_count2 = StudentsResult.objects.filter(
+        registration_number=registration_number,
+        entry_term=term, average__gt=higher_avg_count).count()
+    
+    position = higher_avg_count2 + 1
+    
+    total_rows = StudentsResult.objects.count()
+
+
+    if row_count > 0:
+       total_avg_per_row = total_average / row_count
+      
+   
+
+    
+    student_assessments = StudentAssessments.objects.filter(
         registration_number=registration_number,
         # entry_year=academic_year,
         entry_term=term
@@ -81,11 +114,16 @@ def download_assessment(request, registration_number, academic_year, term):
 
         'student_details': student_details,  
         'student_academic_info':student_results,
+        'student_assessments':student_assessments,
         'logo_url': logo_url,
         'profile_image': profile_image,
         'date': date,
         'academic_year': academic_year,
         'term': term,
+        'total_average': total_average,
+        'average': total_avg_per_row,
+        'position':position,
+        'outOff':total_rows
     }
     
 
@@ -93,7 +131,6 @@ def download_assessment(request, registration_number, academic_year, term):
   
     html_string = render_to_string('admin/students_details.html', context)
     pdf = HTML(string=html_string).write_pdf()
-    
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Student_progress_report.pdf"'
     return response

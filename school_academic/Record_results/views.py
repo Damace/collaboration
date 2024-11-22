@@ -6,8 +6,9 @@ from django.shortcuts import render, redirect
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.db.models import Max
-from exam_setting.models import GradeScale
+from exam_setting.models import ExamsCategory, GradeDivision, GradeScale
 from reports.models import StudentAssessment
+from results.models import Result
 
 
 
@@ -109,14 +110,11 @@ def add_assessment(request, registration_number):
     
     if registration_number:
        student = StudentRegistration.objects.filter(registration_number=registration_number).first()
+     
        if student:
            subjects = student.subjects.all()
        else:
            subjects = []
-
-    
-    
-
     # Pass the student details to the template
     return render(request, 'admin/add_assessment.html', {
         'student': student,
@@ -124,138 +122,268 @@ def add_assessment(request, registration_number):
     })
 
 
+
+
+from django.shortcuts import render, get_object_or_404
+from admission.models import StudentRegistration
+
+def add_assessment2(request, registration_number,extra_context=None):
+    registration_number = request.session.get('registration_number')
+    
+    extra_context = extra_context or {}
+    extra_context.update({
+            "academic_year": AcademicYear.objects.all(),
+            "term": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "stream": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "assessments": Assessment.objects.all(),
+             "grades": GradeScale.objects.all(),
+            
+            "title": "Filter student to",
+        })
+
+    
+    if registration_number:
+       student = StudentRegistration.objects.filter(registration_number=registration_number).first()
+     
+       if student:
+           subjects = student.subjects.all()
+       else:
+           subjects = []
+
+    # Pass the student details to the template
+    return render(request, 'admin/add_assessment2.html', {
+        'student': student,
+        'subjects': subjects,
+        'extra_context': extra_context,
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from main_setting.models import Subject
+from main_setting.models import AcademicYear, Assessment, Class, Programme, Stream, Subject, Term
 from Record_results.models import QueResults, StudentsResult
+from collections import defaultdict
+
+from collections import defaultdict
+from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.db import transaction
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.contrib import messages
+
+from django.db import transaction
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.contrib import messages
+from collections import defaultdict
+
+from django.db import transaction
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.contrib import messages
+from collections import defaultdict
 
 def save_assessment(request):
     if request.method == 'POST':
         registration_number = request.POST.get('registration_number')
         entry_year = request.POST.get('entry_year')
         entry_term = request.POST.get('entry_term')
-        entry_programme = request.POST.get('entry_programme')
-        entry_class = request.POST.get('entry_class')
-        stream_name = request.POST.get('stream_name')
+        full_name = request.POST.get('full_name')
 
-        # Loop through the submitted subjects
-        for key, value in request.POST.items():
-            if key.startswith('mt3_'):
-                subject_id = key.split('_')[1]  # Extract subject ID
-                try:
-                    subject = Subject.objects.get(id=subject_id)
-                    subject_code = request.POST.get(f'subject_code_{subject_id}')
-                    subject_name = request.POST.get(f'subject_name_{subject_id}')
+        try:
+            with transaction.atomic():
+                for key, value in request.POST.items():
+                    
+                    if key.startswith(('mt3_', 'mt4_', 'mte2_', 'ae_', 'hpbt1_', 'hpbt2_', 'hpbt3_')):
+                        subject_id = key.split('_')[1]
 
-                    # Retrieve marks
-                    mt3 = float(request.POST.get(f'mt3_{subject_id}', 0) or 0)
-                    mt4 = float(request.POST.get(f'mt4_{subject_id}', 0) or 0)
-                    mte2 = float(request.POST.get(f'mte2_{subject_id}', 0) or 0)
-                    ae = float(request.POST.get(f'ae_{subject_id}', 0) or 0)
-                    hpbt1 = float(request.POST.get(f'hpbt1_{subject_id}', 0) or 0)
-                    hpbt2 = float(request.POST.get(f'hpbt2_{subject_id}', 0) or 0)
-                    hpbt3 = float(request.POST.get(f'hpbt3_{subject_id}', 0) or 0)
+                        try:
+                            subject = Subject.objects.get(id=subject_id)
+                        except Subject.DoesNotExist:
+                            continue
 
-                    # Calculate average only for the current subject
-                    average = (mt3 + mt4 + mte2 + ae + hpbt1 + hpbt2 + hpbt3) / 7
+                        subject_name = request.POST.get(f'subject_name_{subject_id}')
+                        mt3 = float(request.POST.get(f'mt3_{subject_id}', 0) or 0)
+                        mt4 = float(request.POST.get(f'mt4_{subject_id}', 0) or 0)
+                        mte2 = float(request.POST.get(f'mte2_{subject_id}', 0) or 0)
+                        ae = float(request.POST.get(f'ae_{subject_id}', 0) or 0)
+                        hpbt1 = float(request.POST.get(f'hpbt1_{subject_id}', 0) or 0)
+                        hpbt2 = float(request.POST.get(f'hpbt2_{subject_id}', 0) or 0)
+                        hpbt3 = float(request.POST.get(f'hpbt3_{subject_id}', 0) or 0)
+                        
+                        total = 0
+                        average = 0
+                   
+                        values = [mt3, mt4, mte2, ae, hpbt1, hpbt2, hpbt3]
+                        valid_values = [value for value in values if value not in (None, 0)]
+                        if valid_values:
+                           total = sum(valid_values)
+                           average = total / len(valid_values)
+                      
+                        if 80 <= average <= 100:
+                            grade = 'A'
+                            remark = 'Excellent'
+                        elif 70 <= average < 79:
+                            grade = 'B' 
+                            remark = 'Very good'    
+                        elif 60 <= average < 69:
+                            grade = 'C'
+                            remark = 'Good'  
+                        elif 50 <= average < 59:
+                            grade = 'D'
+                            remark = 'Average'
+                            
+                        elif 40 <= average < 49:
+                            grade = 'D'
+                            remark = 'Satisfactory'  
+                        else:
+                            grade = 'F'
+                            remark = 'Fail' 
 
-                    # Determine grade and remark
-                    if average >= 90:
-                        grade = 'A'
-                        remark = 'EXCELLENT'
-                    elif average >= 80:
-                        grade = 'B'
-                        remark = 'VERY GOOD'
-                    elif average >= 70:
-                        grade = 'C'
-                        remark = 'GOOD'
-                    elif average >= 60:
-                        grade = 'D'
-                        remark = 'FAIR'
-                    elif average >= 50:
-                        grade = 'E'
-                        remark = 'PASS'
-                    elif average >= 40:
-                        grade = 'F'
-                        remark = 'FAIL'
-                    else:
-                        grade = '0'
-                        remark = 'POOR'
-
-                    # Check if the record already exists
-                    existing_result = StudentsResult.objects.filter(
-                        registration_number=registration_number,
-                        entry_year=entry_year,
-                        entry_term=entry_term,
-                        subject_code=subject_code,
-                        subject_name=subject_name
-                    ).first()
-
-                    if existing_result:
-                        # Update only the score fields that are provided in the POST request
-                        if request.POST.get('full_name'):
-                            existing_result.full_name = request.POST.get('full_name')
-
-                        # Update marks only if provided
-                        existing_result.mt3 = mt3 if request.POST.get(f'mt3_{subject_id}') else existing_result.mt3
-                        existing_result.mt4 = mt4 if request.POST.get(f'mt4_{subject_id}') else existing_result.mt4
-                        existing_result.mte2 = mte2 if request.POST.get(f'mte2_{subject_id}') else existing_result.mte2
-                        existing_result.ae = ae if request.POST.get(f'ae_{subject_id}') else existing_result.ae
-                        existing_result.hpbt1 = hpbt1 if request.POST.get(f'hpbt1_{subject_id}') else existing_result.hpbt1
-                        existing_result.hpbt2 = hpbt2 if request.POST.get(f'hpbt2_{subject_id}') else existing_result.hpbt2
-                        existing_result.hpbt3 = hpbt3 if request.POST.get(f'hpbt3_{subject_id}') else existing_result.hpbt3
-
-                        # Only update the average, grade, and remark if scores have changed
-                        if any([
-                            existing_result.mt3 != mt3,
-                            existing_result.mt4 != mt4,
-                            existing_result.mte2 != mte2,
-                            existing_result.ae != ae,
-                            existing_result.hpbt1 != hpbt1,
-                            existing_result.hpbt2 != hpbt2,
-                            existing_result.hpbt3 != hpbt3
-                        ]):
-                            existing_result.average = average
-                            existing_result.grade = grade
-                            existing_result.remark = remark
-                            # Calculate position based on the current subject's scores
-                            position = StudentsResult.objects.filter(
-                                subject_code=subject_code,
-                                subject_name=subject_name,
-                                average__gt=average
-                            ).count() + 1  # Position is 1 plus the count of students with higher averages
-                            existing_result.position = position
-
-                        existing_result.save()  # Save the updated record
-
-                    else:
-                        # Create new record if it doesn't exist
-                        StudentsResult.objects.create(
-                            registration_number=registration_number,
-                            entry_year=entry_year,
-                            entry_term=entry_term,
-                            entry_programme=entry_programme,
-                            entry_class=entry_class,
-                            stream_name=stream_name,
-                            subject_code=subject_code,
+                        result_que, created = StudentsResult.objects.get_or_create(
+                           
                             subject_name=subject_name,
-                            full_name=request.POST.get('full_name'),
-                            mt3=mt3,
-                            mt4=mt4,
-                            mte2=mte2,
-                            ae=ae,
-                            hpbt1=hpbt1,
-                            hpbt2=hpbt2,
-                            hpbt3=hpbt3,
-                            average=average,
-                            grade=grade,
-                            remark=remark,
+                        )
+                        if (
+                            
+                            result_que.mt3 != mt3 or 
+                            result_que.mt4 != mt4 or 
+                            result_que.mte2 != mte2 or 
+                            result_que.ae != ae or 
+                            result_que.hpbt1 != hpbt1 or 
+                            result_que.hpbt2 != hpbt2 or 
+                            result_que.hpbt3 != hpbt3 or 
+                            result_que.average != average or 
+                            result_que.grade != grade or 
+                            result_que.remark != remark or 
+                            result_que.full_name != full_name
+                        ):
+                            result_que.mt3 = mt3
+                            result_que.mt4 = mt4
+                            result_que.mte2 = mte2
+                            result_que.ae = ae
+                            result_que.hpbt1 = hpbt1
+                            result_que.hpbt2 = hpbt2
+                            result_que.hpbt3 = hpbt3
+                            result_que.average = average
+                            result_que.grade = grade
+                            result_que.remark = remark
+                            result_que.full_name = full_name
+                        result_que.save()
+                        
+                        
+                        
+
+                        # Update position for this subject only
+                        position = StudentsResult.objects.filter(
+                            subject_name=subject_name,
+                            average__gt=average
+                        ).count() + 1
+                        result_que.position = position
+                        result_que.save()
+
+                        # Update specific fields in `Result`
+                        Result.objects.update_or_create(
+                            academic_year=entry_year,
+                            term=entry_term,
+                            registration_number=registration_number,
+                            subject=subject_name,
+                            defaults={
+                                'total': total,
+                                'avg': average,
+                                'grade': grade,
+                                # 'division': division_title
+                            }
                         )
 
-                except Subject.DoesNotExist:
-                    continue 
+            messages.success(request, "Results processed successfully!")
+            return redirect('admin:index')
 
-        messages.success(request, "Results processed successfully!")
-        return redirect('admin:index')  # Redirect to the admin homepage
-    # Redirect to the admin homepage  # Redirect to the admin homepage # Redirect to the admin homepage # Redirect to the admin homepage
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+            return redirect('admin:index')
+
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+
+
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from main_setting.models import AcademicYear, Assessment, Class, Programme, Stream, Subject, Term
+from Record_results.models import QueResults, StudentsResult
+
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.contrib import messages
+from .models import StudentAssessments, StudentRegistration, StudentsResult
+
+
+def save_assessment2(request):
+    if request.method == "POST":
+        # Extract basic student info from hidden fields
+        registration_number = request.POST.get("registration_number")
+        full_name = request.POST.get("full_name")
+        entry_year = request.POST.get("entry_year")
+        entry_term = request.POST.get("entry_term")
+        entry_programme = request.POST.get("entry_programme")
+        entry_class = request.POST.get("entry_class")
+        stream_name = request.POST.get("stream_name")
+
+        # Iterate over assessments and either update or insert
+        for key, value in request.POST.items():
+            if key.startswith("grade_"):  # Check for grade fields
+                # Extract assessment ID from the key
+                assessment_id = key.split("_")[1]
+                subject_name = request.POST.get(f"subject_name_{assessment_id}")
+                grade = value
+
+                # Check if a record with the same details exists
+                assessment, created = StudentAssessments.objects.update_or_create(
+                    registration_number=registration_number,
+                    full_name=full_name,
+                    entry_year=entry_year,
+                    entry_term=entry_term,
+                    assessment_name=subject_name,
+                    defaults={
+                        "entry_programme": entry_programme,
+                        "entry_class": entry_class,
+                        "stream_name": stream_name,
+                        "grade": grade,
+                    },
+                )
+
+                # Log the action (optional, for debugging)
+                if created:
+                    print(f"Created new assessment: {assessment}")
+                else:
+                    print(f"Updated existing assessment: {assessment}")
+
+        # Success message
+        messages.success(request, "Students Assessments added successfully!")
+        return redirect('admin:index')  # Redirect to the admin homepage
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+

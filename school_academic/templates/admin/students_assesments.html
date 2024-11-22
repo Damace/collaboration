@@ -76,7 +76,8 @@
       {% csrf_token %}
 
       <fieldset>
-       
+        <legend><small>Enter students assesments</small></legend>
+
 
       <!-- Hidden Fields to Store Selected Criteria -->
       <input type="hidden" name="selected_academic_year" value="{{ selected_academic_year }}">
@@ -85,89 +86,6 @@
       <input type="hidden" name="selected_class" value="{{ selected_class }}">
       <input type="hidden" name="selected_exams" value="{{ selected_exams }}">
       <input type="hidden" name="selected_subject" value="{{ selected_subject }}">
-
-
-
-      <legend><small>Enter students results</small></legend>
-
-      <!-- Hidden Fields to Store Selected Criteria -->
-      <input type="hidden" name="selected_academic_year" value="{{ selected_academic_year }}">
-      <input type="hidden" name="selected_term" value="{{ selected_term }}">
-      <input type="hidden" name="selected_programme" value="{{ selected_programme }}">
-      <input type="hidden" name="selected_class" value="{{ selected_class }}">
-      <input type="hidden" name="selected_stream" value="{{ selected_stream }}">
-      <input type="hidden" name="selected_exams" value="{{ selected_exams }}">
-      <input type="hidden" name="selected_subject" value="{{ selected_subject }}">
-
-
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-md-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center mb-3 mb-md-0">
-                 
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Academic year</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{ selected_academic_year }}</p>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center mb-3 mb-md-0">
-                
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Term</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{ selected_term }}</p>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center mb-3 mb-md-0">
-                
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Programme</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{ selected_programme }}</p>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center">
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Class</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{ selected_class }}</p>
-                  </div>
-                </div>
-
-                <div class="d-flex align-items-center">
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Stream</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{ selected_stream }}</p>
-                  </div>
-                </div>
-
-                
-                {% comment %} <div class="d-flex align-items-center">
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Subject</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{ selected_subject}}</p>
-                  </div>
-                </div>
-
-                <div class="d-flex align-items-center">
-                  <div class="ml-4">
-                    <h5 class="mb-0"><small>Exam</small></h5>
-                    <p class="mb-0" style="color:#650000;font-weight:bold">{{selected_exams}}</p>
-                  </div>
-                </div> {% endcomment %}
-
-
-
-
-
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
 
       <div class="card">
         <div class="card-body">
@@ -190,7 +108,7 @@
                   
                     <td>
 
-                   <a href="{% url 'add_assessment' registration_number=student.registration_number %}" target="_blank">Add</a>
+                   <a href="{% url 'add_assessment2' registration_number=student.registration_number %}" target="_blank">Add</a>
 
 
 

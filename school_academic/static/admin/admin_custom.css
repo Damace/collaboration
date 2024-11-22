@@ -1,0 +1,8 @@
+.field-mt3 input,
+.field-mt4 input,
+.field-mte2 input,
+.field-ae input,
+.field-hpbt1 input,
+.field-hpbt2 input {
+    width: 80px !important; /* Adjust the width as needed */
+}
