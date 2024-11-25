@@ -214,19 +214,21 @@ class ProgressReportsAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
     
-#@admin.register(TermReports)
+@admin.register(TermReports)
 class TermReports(admin.ModelAdmin):
     
     change_list_template = "admin/report_term.html"
+    
 
     def has_add_permission(self, request):
         return False
 
     def changelist_view(self, request, extra_context=None):
+        logo_url = request.build_absolute_uri(static('logo_.png'))
         extra_context = extra_context or {}
         extra_context.update({
             "academic_year": AcademicYear.objects.all(),
-            "term": Term.objects.all(),
+            "terms": Term.objects.all(),
             "programmes": Programme.objects.all(),
             "classes": Class.objects.all(),
             "stream": Stream.objects.all(),
@@ -239,20 +241,13 @@ class TermReports(admin.ModelAdmin):
         })
 
         if request.method == "POST":
-            academic_year = request.POST.get("academic_year")
-            term = request.POST.get("term")
-            new_class = request.POST.get("new_class")
-            stream = request.POST.get("stream")
-          
-            
-            # print('#######################################', academic_year,term,new_class,stream)
-
-            filtered_students = StudentRegistration.objects.filter(
-                entry_year_id=academic_year,
-                entry_term_id=term,
-                entry_class_id=new_class,
-                stream_name_id=stream,
-            
+            academic_year = request.POST.get("academic_year_name_")
+            term = request.POST.get("academic_term")
+       
+      
+            filtered_students = StudentsResult.objects.filter(
+                entry_year=academic_year,
+                entry_term=term,
             )
              
 
@@ -260,20 +255,30 @@ class TermReports(admin.ModelAdmin):
                 extra_context["error_message"] = "No data found for the selected Category." 
                 return super().changelist_view(request, extra_context=extra_context)
             else:
-                # If students are found, pass them to the template
-                extra_context["selected_academic_year"] = AcademicYear.objects.get(id=academic_year).name
-                extra_context["selected_term"] = Term.objects.get(id=term).name
-                extra_context["selected_programme"] = Programme.objects.get(id=programme).name
-                extra_context["selected_class"] = Class.objects.get(id=new_class).class_name
-                extra_context["selected_stream"] = Stream.objects.get(id=stream).name
-                extra_context["filtered_students"] = filtered_students
-                extra_context["filtered_students"] = filtered_students
-               
-            return render(request, "admin/students_progresddddds.html", extra_context) 
-            # return super().changelist_view(request, extra_context=extra_context)
+                 extra_context = {
+                    "selected_academic_year":academic_year,
+                    "selected_term":term,
+                    "filtered_students": filtered_students
+                }
         
+            pdf = self.generate_pdf(filtered_students,logo_url,academic_year,extra_context)
+            
+          
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="Midterm_report.pdf"'
+            return response
 
         return super().changelist_view(request, extra_context=extra_context)
+
+    def generate_pdf(self, filtered_data, logo_url,academic_year,extra_context): 
+        date = timezone.now().strftime('%d-%m-%Y')
+        html_content = render_to_string('admin/report_term_.html', {'data0':extra_context,'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year,'date':date})
+        pdf = weasyprint.HTML(string=html_content).write_pdf()
+        return pdf
+      
+
+    def has_add_permission(self, request):
+        return False
 
     
  ##################################################################### INLINE EDIT FIELDS #########################################################################   

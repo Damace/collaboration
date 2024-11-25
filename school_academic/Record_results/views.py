@@ -192,7 +192,7 @@ from admission.models import StudentRegistration
 
 def add_assessment(request, registration_number):
    
-    registration_number = request.session.get('registration_number')
+   
     
     if registration_number:
        student = StudentRegistration.objects.filter(registration_number=registration_number).first()
@@ -214,7 +214,7 @@ from django.shortcuts import render, get_object_or_404
 from admission.models import StudentRegistration
 
 def add_assessment2(request, registration_number,extra_context=None):
-    registration_number = request.session.get('registration_number')
+
     
     extra_context = extra_context or {}
     extra_context.update({

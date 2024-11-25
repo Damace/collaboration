@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Annual Report</title>
+   
     <style>
         /* General styles */
         body {
@@ -18,8 +18,8 @@
         .header {
             display: flex;
             align-items: center; /* Align items vertically */
-            justify-content: space-between; /* Space between logo and title */
-            margin-bottom: 20px;
+            
+            
         }
 
         h1 {
@@ -31,7 +31,7 @@
 
         .contacts {
             text-align: center; /* Center contacts */
-            margin-top: 10px; /* Space above contacts */
+            
         }
 
         /* Table styling */
@@ -80,44 +80,114 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="{{ logo_url }}" alt="" style="height: 50px; margin-right: 10px;">
-        <h1>KONDOA GIRLS SECONDARY SCHOOL</h1>
+    <div style="display: flex; align-items: center; padding: 5px;">
+        {% load static %}
+        <!-- Logo on the left -->
+        <div style="flex: 0 0 auto;">
+            <img src="{{ logo_url }}" alt="School Logo" style="height: 100px;">
+        </div>
+        <!-- Title in the center -->
+        <div style="flex: 1; text-align: center;">
+            <h2 style="margin: 0;">KONDOA GIRLS SECONDARY SCHOOL</h2>
+            <small style="display: block;">P.O Box 193 Kondoa | Mobile: (255) 713448417</small>
+            <small style="display: block;">Email: kondoagirls@gmail.com</small>
+            <h2 style="margin-top: 20px;"><small>MIDTERM REPORT {{data0.selected_term }}</small></h2>
+        </div>
     </div>
 
-
-  
-    <div class="contacts">
-        <p>Contact us: info@example.com | Phone: (123) 456-7890</p> <!-- Example contact info -->
-        <p>Contact us: info@example.com | Phone: (123) 456-7890</p> <!-- Example contact info -->
-    </div>
-
-<label><b>Term Report</b></label>
-    <table>
+    <hr style="flex-grow: 10; margin: 0 10px;width=100%">
+    <hr style="flex-grow: 20; margin: 0 10px;width=100%">
+    
+    {% comment %} <table>
         <thead>
             <tr>
-                <th>Index</th>
-                <th>Full Name</th>
-                <th class="subject">Subject</th> <!-- Added class for specific styling -->
-                <th>Grade</th>
-                <th>Total</th>
+                <th colspan="8" style="text-align:left;">Results Division Summary</th> <!-- Merged header -->
+            </tr>
+            <tr>
+                <th>I</th>
+                <th>II</th>
+                <th>III</th>
+                <th>IV</th>
+                <th>0</th>
+                <th>INC</th>
+                <th>ABS</th>
+            
             </tr>
         </thead>
         <tbody>
-            {% for item in data %}
-            <tr>
-                <td>{{ item.registration_number }}</td>
-                <td>{{ item.full_name }}</td>
-                <td>{{ item.subject }}</td> <!-- Added class for specific styling -->
-                <td>{{ item.grade }}</td>
-                <td>{{ item.total }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center; color: red;">No data available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            {% comment %} {% for item in data2 %} {% endcomment %}
+            {% comment %} <tr>
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+                <td><small>1</small></td> 
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+                <td><small>0</small></td>
+                <td><small>0</small></td> {% endcomment %}
+
+                {% comment %} <td><small>{{ item.grade_I }}</small></td>
+                <td><small>{{ item.grade_II}}</small></td>
+                <td><small>{{ item.grade_III }}</small></td> 
+                <td><small>{{ item.grade_IV }}</small></td>
+                <td><small>{{ item.grade_0 }}</small></td>
+                <td><small>{{ item.incomplete }}</small></td>
+                <td><small>{{ item.absent }}</small></td> {% endcomment %}
+              
+            
+            {% comment %} </tr> {% endcomment %}
+            {% comment %} {% empty %} {% endcomment %}
+           
+            {% comment %} {% endfor %} {% endcomment %}
+        {% comment %} </tbody> {% endcomment %}
+    {% comment %} </table> {% endcomment %}
+{% comment %} ##################################################################################################### {% endcomment %}
+
+<table>
+    <thead>
+        
+        <tr>
+            <th>S/n</th>
+            <th>Reg no</th>
+            <th>Name</th>
+            <th>Sbj Code</th>
+            <th>Sbj Name</th>
+            <th>MT</th>
+            <th>MT2</th>
+            <th>HPBT1</th>
+            <th>HPBT2</th>
+            <th>AE</th>
+             <th>Avg</th>
+             <th>Grade</th>
+             <th>Position</th>
+              <th>Rmk</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in data %}
+        <tr>
+            <td><small>{{ forloop.counter }}</small></td>
+            <td><small>{{ item.registration_number }}</small></td>
+            <td><small>{{ item.full_name }}</small></td>
+            <td><small>{{ item.subject_code }}</small></td> 
+            <td><small>{{ item.subject_name }}</small></td> 
+            <td><small>{{ item.mt3 }}</small></td>
+            <td><small>{{ item.mt4 }}</small></td>
+            <td><small>{{ item.ae }}</small></td>
+            <td><small>{{ item.hpbt1 }}</small></td>
+            <td><small>{{ item.hpbt2 }}</small></td>
+            <td><small>{{ item.average }}</small></td>
+            <td><small>{{ item.grade }}</small></td>
+            <td><small>{{ item.position }}</small></td>
+            <td><small>{{ item.remark }}</small></td>
+            
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align: center; color: red;">No data available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 </body>
 </html>
