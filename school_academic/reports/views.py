@@ -56,20 +56,30 @@ def download_assessment(request, registration_number, academic_year, term):
     date = timezone.now().strftime('%d-%m-%Y')
     profile_image = request.build_absolute_uri(static('profile.png'))
     
+    
+
+    
     student = StudentRegistration.objects.filter(registration_number=registration_number).first()
     
     student_results = StudentsResult.objects.filter(
         registration_number=registration_number,
-        # entry_year=academic_year,
+        entry_year=academic_year,
         entry_term=term
     )
     
     total_average = StudentsResult.objects.filter(
-     registration_number=registration_number,
-     entry_term=term
+        registration_number=registration_number,
+        entry_year=academic_year,
+        entry_term=term
     ).aggregate(total_avg=Avg('average'))['total_avg']
     
-    higher_avg_count = StudentsResult.objects.filter(average__gt=total_average).count()
+    
+    if total_average is not None:
+       total_average = 0
+       higher_avg_count = StudentsResult.objects.filter(average__gt=total_average).count()
+    else:
+       higher_avg_count = 0
+
 
     row_count = StudentsResult.objects.filter(
         registration_number=registration_number,entry_term=term).count()
@@ -86,8 +96,11 @@ def download_assessment(request, registration_number, academic_year, term):
 
     if row_count > 0:
        total_avg_per_row = total_average / row_count
-      
-   
+    else:
+       total_avg_per_row = 0  
+
+       
+       
 
     
     student_assessments = StudentAssessments.objects.filter(

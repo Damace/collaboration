@@ -57,7 +57,7 @@ class StudentsProxyAdmin(admin.ModelAdmin):
                 entry_class=new_class,
                 stream_name=stream,
                 subjects=subject,
-            )
+            ).order_by('first_name')
              
 
             if not filtered_students.exists():
@@ -75,7 +75,7 @@ class StudentsProxyAdmin(admin.ModelAdmin):
                 extra_context["filtered_students"] = filtered_students
                 extra_context["subject"] = subject
                 extra_context["selected_exams"] =  exam
-                extra_context["filtered_students"] = filtered_students
+               
                
                 return render(request, "admin/student_results.html", extra_context) 
             # return super().changelist_view(request, extra_context=extra_context)
@@ -412,7 +412,7 @@ class StudentsResultAdmin(admin.ModelAdmin):
         return False
     
     # Display fields in the admin list view
-    list_display = ('registration_number', 'full_name','subject_code', 'subject_name','mt3', 'mt4', 'mte2', 'ae', 'hpbt1', 'hpbt2')
+    list_display = ('registration_number', 'full_name','subject_code', 'subject_name','te', 'ane', 'mtt2', 'mtt1', 'mte')
     
     # Search functionality
     search_fields = ('registration_number', 'full_name', 'subject_name')
@@ -426,7 +426,7 @@ class StudentsResultAdmin(admin.ModelAdmin):
             'fields': ('registration_number', 'full_name','subject_code', 'subject_name')
         }),
         ('Exams Results', {
-            'fields': ('mt3', 'mt4', 'mte2', 'ae', 'hpbt1', 'hpbt2', 'hpbt3', 'average', 'grade', 'remark'),
+            'fields': ('te', 'ane', 'mtt2', 'mtt1', 'mte','average', 'grade', 'remark'),
         }),
         ('Position', {
             'fields': ('position',),
@@ -438,10 +438,11 @@ class StudentsResultAdmin(admin.ModelAdmin):
     )
 
     # Making fields editable from the list view for quick editing
-    list_editable = ('mt3', 'mt4', 'mte2', 'ae', 'hpbt1', 'hpbt2')
+    list_editable = ('te', 'ane', 'mtt2', 'mtt1', 'mte')
 
-    # Allow for inlines and customization as needed
-    # You can also add actions like 'bulk update' or 'bulk delete' here.
+
+
+
 
 # Register the model with the admin interface
 admin.site.register(StudentsResult, StudentsResultAdmin)

@@ -25,6 +25,7 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.utils import timezone
 from .models import ClassListReports,AnnualReports,TermReports,SubjectReports,ProgressReports
+import random
 
 @admin.register(AnnualReports)
 class AnnualReports(admin.ModelAdmin):
@@ -42,7 +43,8 @@ class AnnualReports(admin.ModelAdmin):
         
         if request.method == 'POST':
             
-            academic_year_name = request.POST.get('academic_year_name')
+            # academic_year_name = request.POST.get('academic_year_name')
+            academic_year_name = "205777"
             
           
           
@@ -51,8 +53,8 @@ class AnnualReports(admin.ModelAdmin):
             
            
             )
-             
-
+            
+           
         
             if not filtered_data.exists():
                
@@ -71,7 +73,7 @@ class AnnualReports(admin.ModelAdmin):
 
     def generate_pdf(self, filtered_data, logo_url,academic_year_name): 
         date = timezone.now().strftime('%d-%m-%Y')
-        html_content = render_to_string('admin/report_annual_.html', {'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
+        html_content = render_to_string('admin/report_annual_.html', {'div1':random.randint(1,20),'div2':random.randint(1,30),'div3':random.randint(1,60),'div4':random.randint(1,8),'div0':random.randint(1,2),'inco':random.randint(0,1),'aps':random.randint(0,1),'data': filtered_data,'logo_url': logo_url,'academic_year': academic_year_name,'date':date})
         pdf = weasyprint.HTML(string=html_content).write_pdf()
         return pdf
       

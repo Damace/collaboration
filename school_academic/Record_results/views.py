@@ -33,13 +33,11 @@ def add_results_view(request):
         exam_type = request.POST.get('selected_exams')
         
         
-       
 
         # Get selected students
         selected_students = request.POST.getlist('selected_students')
         
-        
-        
+    
         
         try:
             with transaction.atomic():  # Ensure atomic database transactions
@@ -52,28 +50,22 @@ def add_results_view(request):
                     
                 
                     # Initialize all score fields
-                    mt3 = mt4 = mte2 = ae = hpbt1 = hpbt2 = hpbt3 = 0
+                    te = ane = mtt2 = mtt1 = mte = 0
       
-                    if exam_type == 'ANNUAL EST':
-                        ae = subject_result
-                    elif exam_type == 'MT3':
-                        mt3 = subject_result
-                    elif exam_type == 'MT4':
-                        mt4 = subject_result
-                    elif exam_type == 'MTE2':
-                        mte2 = subject_result
-                    elif exam_type == 'HPBT1':
-                        hpbt1 = subject_result
-                    elif exam_type == 'HPBT2':
-                        hpbt2 = subject_result
-                    elif exam_type == 'HPBT3':
-                        hpbt3 = subject_result
-                    
-                                            
+                    if exam_type == 'TERMINAL EXAMINATION':
+                        te = subject_result
+                    elif exam_type == 'ANNUAL EXAMINATION':
+                        ane = subject_result
+                    elif exam_type == 'MONTHLY TEST 2':
+                        mtt2 = subject_result
+                    elif exam_type == 'MONTHLY TEST 1':
+                        mtt1 = subject_result
+                    elif exam_type == 'MIDTERM EXAMINATION':
+                        mte = subject_result                   
                         total = 0
                         average = 0
                    
-                    values = [mt3, mt4, mte2, ae, hpbt1, hpbt2, hpbt3]
+                    values = [te,ane,mtt2,mtt1,mte]
                     valid_values = [value for value in values if value not in (None, 0)]
                     if valid_values:
                            total = sum(valid_values)
@@ -111,19 +103,74 @@ def add_results_view(request):
                         full_name=f"{first_name} {last_name}",
                         subject_code=subject_code,
                         subject_name=subject,
-                        mt3=mt3,
-                        mt4=mt4,
-                        mte2=mte2,
-                        ae=ae,
-                        hpbt1=hpbt1,
-                        hpbt2=hpbt2,
-                        hpbt3=hpbt3,
-                        average=average,
+                        te=te,
+                        ane=ane,
+                        mtt2=mtt2,
+                        mtt1=mtt1,
+                        mte=mte,
+                        average='0',
                         grade=grade,
                         remark=remark,
                         position=random.uniform(1, 100),
+                        result_summary =  f", {subject} = {subject_result}"  , 
                     )
                     student_result.save()
+                    # division_counts = defaultdict(int)
+                    # que_results = StudentsResult.objects.values('entry_year', 'entry_term', 'te','ane','mtt2','mtt1','mte','registration_number', 'full_name', 'average', 'grade','remark','position','result_summary')
+                    # for que_result in que_results:
+                    #     aggregated_results = StudentsResult.objects.filter(
+                    #     entry_year=que_result['entry_year'],
+                    #     entry_term=que_result['entry_term'],   
+                    #     registration_number=que_result['registration_number'],
+                    #     full_name=que_result['full_name']
+                    #     )
+        
+                    #     total_result = aggregated_results['total'] 
+                    #     average_result = aggregated_results['average'] 
+                        
+                    #     grade_instance = GradeScale.objects.filter(minimum_marks__lte=average_result).order_by('-minimum_marks').first()
+                    #     grade_name = grade_instance.grade_name if grade_instance else None
+                    #     grade_point = grade_instance.grade_point if grade_instance else None
+        
+                    #     division_instance = GradeDivision.objects.filter(minimum_division_point__lte=average_result).order_by('-minimum_division_point').first()
+                    #     division_title = division_instance.division_title if division_instance else None
+                        
+                    #             # Count the division title
+                    #     if division_title in ['I', 'II', 'III', 'IV', '0', 'INC', 'ABS']:
+                    #        division_counts[division_title] += 1
+        
+                    #      # Update or create Result instance
+                    #     existing_result = Result.objects.filter(
+                    #     academic_year=que_result['academic_year'],
+                    #     term=que_result['term'],
+                    #     registration_number=que_result['registration_number'],
+                    #     full_name=que_result['student_name']
+                    #      ).first() 
+                        
+                    #     if existing_result: 
+                    #        existing_result.subject += f", {que_result['result_summary']}"  ,  
+                    #        existing_result.total = total
+                    #        existing_result.avg = average
+                    #        existing_result.grade = grade  # Update the grade
+                    #        existing_result.point = grade  # Update the grade point
+                    #        existing_result.division = division_title
+                    #        existing_result.save() 
+                    #     else:
+                    #        Result.objects.create(
+                    #        academic_year=que_result['academic_year'],
+                    #        term=que_result['term'],
+                    #        exam_type=que_result['exam_type'],
+                    #        registration_number=que_result['registration_number'],
+                    #        full_name=que_result['student_name'],
+                    #        subject = que_result['result_summary'],
+                    #        total=total,
+                    #        avg=average,  
+                    #        grade=grade,  # Update the grade
+                    #        point=grade,
+                    #        division=division_title
+                    #        )
+            
+                  
                     
 
             messages.success(request, "Results added successfully!")
@@ -248,20 +295,6 @@ def add_assessment2(request, registration_number,extra_context=None):
     })
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from main_setting.models import AcademicYear, Assessment, Class, Programme, Stream, Subject, Term
@@ -288,6 +321,7 @@ from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib import messages
 from collections import defaultdict
+from django.db import models
 
 def save_assessment(request):
     if request.method == 'POST':
@@ -300,7 +334,7 @@ def save_assessment(request):
             with transaction.atomic():
                 for key, value in request.POST.items():
                     
-                    if key.startswith(('mt3_', 'mt4_', 'mte2_', 'ae_', 'hpbt1_', 'hpbt2_', 'hpbt3_')):
+                    if key.startswith(('te_', 'ane_', 'mtt2_', 'mtt1_','mte_')):
                         subject_id = key.split('_')[1]
 
                         try:
@@ -309,18 +343,17 @@ def save_assessment(request):
                             continue
 
                         subject_name = request.POST.get(f'subject_name_{subject_id}')
-                        mt3 = float(request.POST.get(f'mt3_{subject_id}', 0) or 0)
-                        mt4 = float(request.POST.get(f'mt4_{subject_id}', 0) or 0)
-                        mte2 = float(request.POST.get(f'mte2_{subject_id}', 0) or 0)
-                        ae = float(request.POST.get(f'ae_{subject_id}', 0) or 0)
-                        hpbt1 = float(request.POST.get(f'hpbt1_{subject_id}', 0) or 0)
-                        hpbt2 = float(request.POST.get(f'hpbt2_{subject_id}', 0) or 0)
-                        hpbt3 = float(request.POST.get(f'hpbt3_{subject_id}', 0) or 0)
+                        te = float(request.POST.get(f'te_{subject_id}', 0) or 0)
+                        ane = float(request.POST.get(f'ane_{subject_id}', 0) or 0)
+                        mtt2 = float(request.POST.get(f'mtt2_{subject_id}', 0) or 0)
+                        mtt1 = float(request.POST.get(f'mtt1_{subject_id}', 0) or 0)
+                        mte = float(request.POST.get(f'mte_{subject_id}', 0) or 0)
+                     
                         
                         total = 0
                         average = 0
                    
-                        values = [mt3, mt4, mte2, ae, hpbt1, hpbt2, hpbt3]
+                        values = [te,ane,mtt2,mtt1,mte]
                         valid_values = [value for value in values if value not in (None, 0)]
                         if valid_values:
                            total = sum(valid_values)
@@ -352,34 +385,27 @@ def save_assessment(request):
                         )
                         if (
                             
-                            result_que.mt3 != mt3 or 
-                            result_que.mt4 != mt4 or 
-                            result_que.mte2 != mte2 or 
-                            result_que.ae != ae or 
-                            result_que.hpbt1 != hpbt1 or 
-                            result_que.hpbt2 != hpbt2 or 
-                            result_que.hpbt3 != hpbt3 or 
+                            result_que.te != te or 
+                            result_que.ane != ane or 
+                            result_que.mtt2 != mtt2 or 
+                            result_que.mtt1 != mtt1 or 
+                            result_que.mte !=mte or
                             result_que.average != average or 
                             result_que.grade != grade or 
                             result_que.remark != remark or 
                             result_que.full_name != full_name
                         ):
-                            result_que.mt3 = mt3
-                            result_que.mt4 = mt4
-                            result_que.mte2 = mte2
-                            result_que.ae = ae
-                            result_que.hpbt1 = hpbt1
-                            result_que.hpbt2 = hpbt2
-                            result_que.hpbt3 = hpbt3
+                            result_que.te = te
+                            result_que.ane = ane
+                            result_que.mtt2 = mtt2
+                            result_que.mtt1 = mtt1
+                            result_que.mte = mte
                             result_que.average = average
                             result_que.grade = grade
                             result_que.remark = remark
                             result_que.full_name = full_name
                         result_que.save()
-                        
-                        
-                        
-
+           
                         # Update position for this subject only
                         position = StudentsResult.objects.filter(
                             subject_name=subject_name,
@@ -388,19 +414,6 @@ def save_assessment(request):
                         result_que.position = position
                         result_que.save()
 
-                        # Update specific fields in `Result`
-                        Result.objects.update_or_create(
-                            academic_year=entry_year,
-                            term=entry_term,
-                            registration_number=registration_number,
-                            subject=subject_name,
-                            defaults={
-                                'total': total,
-                                'avg': average,
-                                'grade': grade,
-                                # 'division': division_title
-                            }
-                        )
 
             messages.success(request, "Results processed successfully!")
             return redirect('admin:index')
@@ -410,10 +423,6 @@ def save_assessment(request):
             return redirect('admin:index')
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-
-
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse

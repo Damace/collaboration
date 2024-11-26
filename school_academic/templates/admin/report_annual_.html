@@ -98,10 +98,10 @@
     <hr style="flex-grow: 10; margin: 0 10px;width=100%">
     <hr style="flex-grow: 20; margin: 0 10px;width=100%">
     
-    {% comment %} <table>
+   <table width="100%">
         <thead>
             <tr>
-                <th colspan="8" style="text-align:left;">Results Division Summary</th> <!-- Merged header -->
+                <th colspan="8" style="text-align:center;">Results Division Summary</th> <!-- Merged header -->
             </tr>
             <tr>
                 <th>I</th>
@@ -115,31 +115,25 @@
             </tr>
         </thead>
         <tbody>
-            {% comment %} {% for item in data2 %} {% endcomment %}
-            {% comment %} <tr>
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-                <td><small>1</small></td> 
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-                <td><small>0</small></td>
-                <td><small>0</small></td> {% endcomment %}
+       
+           <tr>
+        
 
-                {% comment %} <td><small>{{ item.grade_I }}</small></td>
-                <td><small>{{ item.grade_II}}</small></td>
-                <td><small>{{ item.grade_III }}</small></td> 
-                <td><small>{{ item.grade_IV }}</small></td>
-                <td><small>{{ item.grade_0 }}</small></td>
-                <td><small>{{ item.incomplete }}</small></td>
-                <td><small>{{ item.absent }}</small></td> {% endcomment %}
+                <td><small>{{ div1 }}</small></td>
+                <td><small>{{ div2}}</small></td>
+                <td><small>{{ div3 }}</small></td> 
+                <td><small>{{ div4}}</small></td>
+                <td><small>{{ div0 }}</small></td>
+                <td><small>{{ inco }}</small></td>
+                <td><small>{{ aps }}</small></td> 
               
             
-            {% comment %} </tr> {% endcomment %}
-            {% comment %} {% empty %} {% endcomment %}
+        </tr>
+      
            
-            {% comment %} {% endfor %} {% endcomment %}
-        {% comment %} </tbody> {% endcomment %}
-    {% comment %} </table> {% endcomment %}
+          
+      </tbody> 
+  </table> 
 {% comment %} ##################################################################################################### {% endcomment %}
 
 <table>
@@ -151,11 +145,11 @@
             <th>Full Name</th>
             <th>Sbj Code</th>
             <th>Sbj Name</th>
-            <th>MT</th>
-            <th>MT2</th>
-            <th>HPBT1</th>
-            <th>HPBT2</th>
-            <th>AE</th>
+            <th>TE</th>
+            <th>ANE</th>
+            <th>MTT1</th>
+            <th>MTT2</th>
+            <th>MTE</th>
              <th>Avg</th>
              <th>Grade</th>
              <th>Position</th>
@@ -170,11 +164,11 @@
             <td><small>{{ item.full_name }}</small></td>
             <td><small>{{ item.subject_code }}</small></td> 
             <td><small>{{ item.subject_name }}</small></td> 
-            <td><small>{{ item.mt3 }}</small></td>
-            <td><small>{{ item.mt4 }}</small></td>
-            <td><small>{{ item.ae }}</small></td>
-            <td><small>{{ item.hpbt1 }}</small></td>
-            <td><small>{{ item.hpbt2 }}</small></td>
+            <td><small>{{ item.te }}</small></td>
+            <td><small>{{ item.ane }}</small></td>
+            <td><small>{{ item.mtt1 }}</small></td>
+            <td><small>{{ item.mtt2 }}</small></td>
+            <td><small>{{ item.mte }}</small></td>
             <td><small>{{ item.average }}</small></td>
             <td><small>{{ item.grade }}</small></td>
             <td><small>{{ item.position }}</small></td>
