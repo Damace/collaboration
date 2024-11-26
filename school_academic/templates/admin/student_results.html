@@ -189,7 +189,7 @@
                 {% for student in filtered_students %}
                   <tr>
                     <td>
-                      <input type="checkbox" name="selected_students" value="{{ student.id }}" checked class="select-student" />
+                      <input type="checkbox" name="selected_students" value="{{ student.id }}"  class="select-student" />
                       <input type="hidden" name="student_registration_number_{{ student.id }}" value="{{ student.registration_number }}">
                       <input type="hidden" name="student_first_name_{{ student.id }}" value="{{ student.first_name }}">
                       <input type="hidden" name="student_last_name_{{ student.id }}" value="{{ student.last_name }}">
