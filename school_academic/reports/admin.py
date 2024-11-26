@@ -13,7 +13,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from exam_setting.models import ExamsCategory, GradeScale
-from Record_results.models import StudentsResult
+from Record_results.models import ClassResults, StudentsResult
 from weasyprint import HTML
 from django.contrib import admin
 from django.http import HttpResponse
@@ -43,17 +43,15 @@ class AnnualReports(admin.ModelAdmin):
         
         if request.method == 'POST':
             
-            # academic_year_name = request.POST.get('academic_year_name')
-            academic_year_name = "205777"
-            
-          
-          
-            filtered_data= StudentsResult.objects.filter(
-             entry_year=academic_year_name,  
+            academic_year_name = request.POST.get('academic_year_name')
+         
+            filtered_data= ClassResults.objects.filter(
+            academic_year=academic_year_name,
             
            
             )
             
+           
            
         
             if not filtered_data.exists():
@@ -247,12 +245,12 @@ class TermReports(admin.ModelAdmin):
             term = request.POST.get("academic_term")
        
       
-            filtered_students = StudentsResult.objects.filter(
-                entry_year=academic_year,
-                entry_term=term,
+            filtered_students = ClassResults.objects.filter(
+                 academic_year=academic_year,
+                 term=term,
             )
              
-
+         
             if not filtered_students.exists():
                 extra_context["error_message"] = "No data found for the selected Category." 
                 return super().changelist_view(request, extra_context=extra_context)
@@ -403,24 +401,19 @@ class ClassListReports(admin.ModelAdmin):
              
             academic_class = request.POST.get('class')
             
-            student_results = StudentsResult.objects.filter(
-             entry_year=academic_year_name,  
-             entry_term=academic_term,
+            student_results = ClassResults.objects.filter(
+             academic_year=academic_year_name,  
+             term=academic_term,
              entry_class=academic_class,
            
             )
-             
-          
-          
-    
-        
             if not student_results.exists():
                
                 extra_context["error_message"] = "No data found for the selected academic year." 
                 return super().changelist_view(request, extra_context=extra_context)
 
            
-            pdf = self.generate_pdf(student_results,logo_url,academic_class)
+            pdf = self.generate_pdf(student_results,logo_url,academic_class,academic_year_name,academic_term)
             
           
             response = HttpResponse(pdf, content_type='application/pdf')
@@ -429,9 +422,9 @@ class ClassListReports(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-    def generate_pdf(self,student_results, logo_url,academic_class): 
+    def generate_pdf(self,student_results, logo_url,academic_class,academic_year_name,academic_term): 
         date = timezone.now().strftime('%d-%m-%Y')
-        html_content = render_to_string('admin/class_rpt.html', {'class_name':academic_class,'data':student_results,'logo_url': logo_url,'date':date})
+        html_content = render_to_string('admin/class_rpt.html', {'academic_term':academic_term,'academic_year_name':academic_year_name,'class_name':academic_class,'data':student_results,'logo_url': logo_url,'date':date})
         pdf = weasyprint.HTML(string=html_content).write_pdf()
         return pdf
       

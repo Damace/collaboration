@@ -91,7 +91,7 @@
             <h2 style="margin: 0;">KONDOA GIRLS SECONDARY SCHOOL</h2>
             <small style="display: block;">P.O Box 193 Kondoa | Mobile: (255) 713448417</small>
             <small style="display: block;">Email: kondoagirls@gmail.com</small>
-            <h2 style="margin-top: 20px;"><small>CLASS REPORT  (   {{class_name}}  )</small></h2>
+            <h2 style="margin-top: 20px;"><small>CLASS REPORT  (   {{class_name}}  ) <br> Academic year: {{academic_year_name}},  Term: {{academic_term}}</small></h2>
         </div>
     </div>
 
@@ -111,14 +111,9 @@
                 <th>S/n</th>
                 <th>Reg number</th>
                 <th>Full Name</th>
-                <th>Sbj Code</th>
+                <th>Stream</th>
                 <th>Sbj Name</th>
-                <th>TE</th>
-                <th>ANE</th>
-                <th>MTT1</th>
-                <th>MTT2</th>
-                <th>MTE</th>
-                 <th>Avg</th>
+                <th>Marks</th>
                  <th>Grade</th>
                  <th>Position</th>
                   <th>Rmk</th>
@@ -130,15 +125,10 @@
                 <td><small>{{ forloop.counter }}</small></td>
                 <td><small>{{ item.registration_number }}</small></td>
                 <td><small>{{ item.full_name }}</small></td>
-                <td><small>{{ item.subject_code }}</small></td> 
-                <td><small>{{ item.subject_name }}</small></td> 
-                <td><small>{{ item.te }}</small></td>
-                <td><small>{{ item.ane }}</small></td>
-                <td><small>{{ item.mtt1 }}</small></td>
-                <td><small>{{ item.mtt2 }}</small></td>
-                <td><small>{{ item.mte }}</small></td>
-                <td><small>{{ item.average }}</small></td>
-                <td><small>{{ item.grade }}</small></td>
+                <td><small>{{ item.stream_name }}</small></td>
+                <td><small>{{ item.subjects }}</small></td> 
+                <td><small>{{ item.scores }}</small></td> 
+                 <td><small>{{ item.grade }}</small></td>
                 <td><small>{{ item.position }}</small></td>
                 <td><small>{{ item.remark }}</small></td>
                 

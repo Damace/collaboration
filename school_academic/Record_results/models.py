@@ -118,6 +118,28 @@ class StudentsResultQue(models.Model):
         return f"{self.full_name} - {self.subject_name} ({self.entry_year} - {self.entry_term})"
 
 
+class ClassResults(models.Model):
+    registration_number = models.CharField(max_length=50)
+    academic_year = models.CharField(max_length=50)
+    term = models.CharField(max_length=50)
+    entry_programme = models.CharField(max_length=100)
+    entry_class = models.CharField(max_length=50)
+    stream_name = models.CharField(max_length=50)
+    stream_name = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=100)
+    subjects = models.TextField()  
+    scores = models.TextField()
+    te = models.CharField(max_length=100)
+    ane = models.CharField(max_length=100)
+    mtt2 = models.CharField(max_length=100)
+    mtt1 = models.CharField(max_length=100)
+    mte = models.CharField(max_length=100)
+    average = models.FloatField(max_length=100)
+    grade = models.CharField(max_length=2)
+    remark = models.CharField(max_length=100)
+    position = models.IntegerField()
+    
+    
 class StudentAssessments(models.Model):
     student = models.CharField(max_length=50)
     registration_number = models.CharField(max_length=50)

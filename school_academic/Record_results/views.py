@@ -17,7 +17,7 @@ from django.db import transaction
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.db import transaction
-from .models import StudentsResult, GradeScale
+from .models import ClassResults, StudentsResult, GradeScale
 import random
 
 def add_results_view(request):
@@ -115,64 +115,89 @@ def add_results_view(request):
                         result_summary =  f", {subject} = {subject_result}"  , 
                     )
                     student_result.save()
-                    # division_counts = defaultdict(int)
-                    # que_results = StudentsResult.objects.values('entry_year', 'entry_term', 'te','ane','mtt2','mtt1','mte','registration_number', 'full_name', 'average', 'grade','remark','position','result_summary')
-                    # for que_result in que_results:
-                    #     aggregated_results = StudentsResult.objects.filter(
-                    #     entry_year=que_result['entry_year'],
-                    #     entry_term=que_result['entry_term'],   
-                    #     registration_number=que_result['registration_number'],
-                    #     full_name=que_result['full_name']
-                    #     )
-        
-                    #     total_result = aggregated_results['total'] 
-                    #     average_result = aggregated_results['average'] 
-                        
-                    #     grade_instance = GradeScale.objects.filter(minimum_marks__lte=average_result).order_by('-minimum_marks').first()
-                    #     grade_name = grade_instance.grade_name if grade_instance else None
-                    #     grade_point = grade_instance.grade_point if grade_instance else None
-        
-                    #     division_instance = GradeDivision.objects.filter(minimum_division_point__lte=average_result).order_by('-minimum_division_point').first()
-                    #     division_title = division_instance.division_title if division_instance else None
-                        
-                    #             # Count the division title
-                    #     if division_title in ['I', 'II', 'III', 'IV', '0', 'INC', 'ABS']:
-                    #        division_counts[division_title] += 1
-        
-                    #      # Update or create Result instance
-                    #     existing_result = Result.objects.filter(
-                    #     academic_year=que_result['academic_year'],
-                    #     term=que_result['term'],
-                    #     registration_number=que_result['registration_number'],
-                    #     full_name=que_result['student_name']
-                    #      ).first() 
-                        
-                    #     if existing_result: 
-                    #        existing_result.subject += f", {que_result['result_summary']}"  ,  
-                    #        existing_result.total = total
-                    #        existing_result.avg = average
-                    #        existing_result.grade = grade  # Update the grade
-                    #        existing_result.point = grade  # Update the grade point
-                    #        existing_result.division = division_title
-                    #        existing_result.save() 
-                    #     else:
-                    #        Result.objects.create(
-                    #        academic_year=que_result['academic_year'],
-                    #        term=que_result['term'],
-                    #        exam_type=que_result['exam_type'],
-                    #        registration_number=que_result['registration_number'],
-                    #        full_name=que_result['student_name'],
-                    #        subject = que_result['result_summary'],
-                    #        total=total,
-                    #        avg=average,  
-                    #        grade=grade,  # Update the grade
-                    #        point=grade,
-                    #        division=division_title
-                    #        )
-            
-                  
                     
+                    groups = StudentsResult.objects.values(
+                        'registration_number',
+                        'entry_year',
+                        'entry_term',
+                        'entry_programme',
+                        'entry_class',
+                        'stream_name',
+                        'full_name',
+                        'average',
+                        'grade',
+                        'remark',
+                        'position'
+                        ).distinct()
+                    
+                    for group in groups:
+                        
+                        results = StudentsResult.objects.filter(
+                            registration_number=group['registration_number'],
+                            entry_year=group['entry_year'],
+                            entry_term=group['entry_term']
+                              )
 
+           
+                        subjects = ", ".join(result.subject_name for result in results)
+                        
+                        valid_scores = []
+                        for result in results:
+                            if result.te and float(result.te) > 0:
+                                valid_scores.append(str(float(result.te)))
+                            if result.ane and float(result.ane) > 0:
+                                valid_scores.append(str(float(result.ane)))
+                            if result.mtt2 and float(result.mtt2) > 0:
+                                valid_scores.append(str(float(result.mtt2)))
+                            if result.mtt1 and float(result.mtt1) > 0:
+                                valid_scores.append(str(float(result.mtt1)))
+                            if result.mte and float(result.mte) > 0:
+                                valid_scores.append(str(float(result.mte)))
+
+
+                            scores = ", ".join(valid_scores)  # This is now a string, not a list
+ 
+
+                       
+                        # scores = ", ".join(str(result.te) for result in results)
+                        
+                        
+                        existing_record = ClassResults.objects.filter(
+                        registration_number=group['registration_number'],
+                        academic_year=group['entry_year'],
+                        term=group['entry_term'],
+                       full_name=group['full_name'],
+                       ).first()
+
+                    if existing_record:
+                        existing_record.subjects = subjects
+                        existing_record.scores = scores
+                        existing_record.average = group['average']
+                        existing_record.grade = group['grade']
+                        existing_record.remark = group['remark']
+                        existing_record.position = group['position']
+                        existing_record.save()
+
+                    else:
+                        ClassResults.objects.create(
+                        registration_number=group['registration_number'],
+                        academic_year=group['entry_year'],
+                        term=group['entry_term'],
+                        entry_programme=group['entry_programme'],
+                        entry_class=group['entry_class'],
+                        stream_name=group['stream_name'],
+                        full_name=group['full_name'],
+                        subjects=subjects,
+                        scores=scores,
+                        average=group['average'],
+                        grade=group['grade'],
+                       remark=group['remark'],
+                       position=group['position']
+                )
+                        
+                        
+                        
+                   
             messages.success(request, "Results added successfully!")
             return redirect('admin:index')  # Redirect to the admin homepage
 

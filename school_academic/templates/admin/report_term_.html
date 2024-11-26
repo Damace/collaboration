@@ -147,16 +147,11 @@
         
         <tr>
             <th>S/n</th>
-            <th>Reg no</th>
-            <th>Name</th>
-            <th>Sbj Code</th>
+            <th>Reg number</th>
+            <th>Full Name</th>
+            <th>Stream</th>
             <th>Sbj Name</th>
-            <th>MT</th>
-            <th>MT2</th>
-            <th>HPBT1</th>
-            <th>HPBT2</th>
-            <th>AE</th>
-             <th>Avg</th>
+            <th>Marks</th>
              <th>Grade</th>
              <th>Position</th>
               <th>Rmk</th>
@@ -168,15 +163,10 @@
             <td><small>{{ forloop.counter }}</small></td>
             <td><small>{{ item.registration_number }}</small></td>
             <td><small>{{ item.full_name }}</small></td>
-            <td><small>{{ item.subject_code }}</small></td> 
-            <td><small>{{ item.subject_name }}</small></td> 
-            <td><small>{{ item.mt3 }}</small></td>
-            <td><small>{{ item.mt4 }}</small></td>
-            <td><small>{{ item.ae }}</small></td>
-            <td><small>{{ item.hpbt1 }}</small></td>
-            <td><small>{{ item.hpbt2 }}</small></td>
-            <td><small>{{ item.average }}</small></td>
-            <td><small>{{ item.grade }}</small></td>
+            <td><small>{{ item.stream_name }}</small></td>
+            <td><small>{{ item.subjects }}</small></td> 
+            <td><small>{{ item.scores }}</small></td> 
+             <td><small>{{ item.grade }}</small></td>
             <td><small>{{ item.position }}</small></td>
             <td><small>{{ item.remark }}</small></td>
             
