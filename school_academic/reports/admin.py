@@ -181,9 +181,7 @@ class ProgressReportsAdmin(admin.ModelAdmin):
             new_class = request.POST.get("class_name")
             stream = request.POST.get("stream_name")
           
-            
-            # print('#######################################', academic_year,term,new_class,stream)
-
+        
             filtered_students = StudentRegistration.objects.filter(
                 entry_year_id=academic_year,
                 entry_term_id=term,

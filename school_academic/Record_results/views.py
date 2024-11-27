@@ -46,7 +46,7 @@ def add_results_view(request):
                     registration_number = request.POST.get(f'student_registration_number_{student_id}')
                     first_name = request.POST.get(f'student_first_name_{student_id}')
                     last_name = request.POST.get(f'student_last_name_{student_id}')
-                    subject_result = float(request.POST.get(f'result_{student_id}', 0) or 0)
+                    subject_result = float(request.POST.get(f'result_{student_id}','') or '')
                     
                 
                     # Initialize all score fields
@@ -108,7 +108,7 @@ def add_results_view(request):
                         mtt2=mtt2,
                         mtt1=mtt1,
                         mte=mte,
-                        average='0',
+                        average=average,
                         grade=grade,
                         remark=remark,
                         position=random.uniform(1, 100),

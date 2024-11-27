@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import redirect, render
 
 # Create your views here.
 from django.shortcuts import render
@@ -67,19 +68,28 @@ def download_assessment(request, registration_number, academic_year, term):
         entry_term=term
     )
     
-    total_average = StudentsResult.objects.filter(
+    student_result = StudentsResult.objects.filter(
+        registration_number=registration_number,
+        entry_year=academic_year,
+        entry_term=term
+    )
+    
+    if not student_result.exists():
+        messages.error(request, "No Results available.")
+        return redirect('admin:index')  # Redirect to the admin homepage
+        
+      
+
+    else:
+        
+        total_average = StudentsResult.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
         entry_term=term
     ).aggregate(total_avg=Avg('average'))['total_avg']
-    
-    
-    if total_average is not None:
-       total_average = 0
-       higher_avg_count = StudentsResult.objects.filter(average__gt=total_average).count()
-    else:
-       higher_avg_count = 0
-
+        
+        
+    higher_avg_count = StudentsResult.objects.filter(average__gt=total_average).count()
 
     row_count = StudentsResult.objects.filter(
         registration_number=registration_number,entry_term=term).count()
