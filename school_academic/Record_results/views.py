@@ -48,28 +48,35 @@ def add_results_view(request):
                     last_name = request.POST.get(f'student_last_name_{student_id}')
                     subject_result = float(request.POST.get(f'result_{student_id}','') or '')
                     
-                
-                    # Initialize all score fields
-                    te = ane = mtt2 = mtt1 = mte = 0
-      
+                    
+                    
                     if exam_type == 'TERMINAL EXAMINATION':
                         te = subject_result
+                        ane = mtt2 = mtt1 = mte =  0  
+                 
                     elif exam_type == 'ANNUAL EXAMINATION':
                         ane = subject_result
+                        te = mtt2 = mtt1 = mte =  0  
                     elif exam_type == 'MONTHLY TEST 2':
                         mtt2 = subject_result
+                        te = ane = mtt1 = mte =  0  
                     elif exam_type == 'MONTHLY TEST 1':
                         mtt1 = subject_result
+                        te = ane = mtt2 = mte =  0  
                     elif exam_type == 'MIDTERM EXAMINATION':
-                        mte = subject_result                   
-                        total = 0
-                        average = 0
+                        mte = subject_result
+                        te = ane = mtt2 = mtt1 =  0 
+                        
+                                        
+                    total = 0
+                    average = 0
                    
                     values = [te,ane,mtt2,mtt1,mte]
                     valid_values = [value for value in values if value not in (None, 0)]
                     if valid_values:
-                           total = sum(valid_values)
-                           average = total / len(valid_values)
+                          total = sum(valid_values)
+                          average = total / len(valid_values)
+                      
                       
                     if 80 <= subject_result <= 100:
                             grade = 'A'
@@ -91,30 +98,102 @@ def add_results_view(request):
                             grade = 'F'
                             remark = 'Fail' 
 
+                    student_result = StudentsResult.objects.filter(
+                    registration_number=registration_number,
+                    entry_year=academic_year,
+                    entry_term=term,
+                    subject_name=subject
+                    ).first()
 
-                    # Create a new student result entry
-                    student_result = StudentsResult.objects.create(
+
+                    if student_result is None:
+                        
+                        student_result = StudentsResult(
                         registration_number=registration_number,
                         entry_year=academic_year,
                         entry_term=term,
                         entry_programme=programme,
-                        entry_class=selected_class,
                         stream_name=selected_stream,
-                        full_name=f"{first_name} {last_name}",
-                        subject_code=subject_code,
+                        entry_class=selected_class,
                         subject_name=subject,
-                        te=te,
+                        subject_code = subject_code,
+                        te=te ,
                         ane=ane,
                         mtt2=mtt2,
                         mtt1=mtt1,
                         mte=mte,
-                        average=average,
+                        average=subject_result,
                         grade=grade,
                         remark=remark,
-                        position=random.uniform(1, 100),
-                        result_summary =  f", {subject} = {subject_result}"  , 
-                    )
-                    student_result.save()
+                        full_name=f"{first_name} {last_name}",
+                        result_summary=f", {subject} = {subject_result}",
+                        position=random.uniform(1, 100)  # Set position to a random value
+                      )
+                        student_result.save() 
+                        
+                    else:
+                        update_fields = []
+                        
+                        if te == 0:
+                           te = student_result.te  
+                        else:
+                           student_result.te = te
+                           update_fields.append('te')
+                 
+                        if ane == 0:
+                           ane = student_result.ane  
+                        else:
+                           student_result.ane = ane
+                           update_fields.append('ane')    
+                 
+                        if mtt2 == 0:
+                           mtt2 = student_result.mtt2  
+                        else:
+                           student_result.mtt2 = mtt2
+                           update_fields.append('mtt2')  
+                    
+                        if mtt1 == 0:
+                           mtt1 = student_result.mtt1 
+                        else:
+                           student_result.mtt1 = mtt1
+                           update_fields.append('mtt1')  
+                    
+                        if mte == 0:
+                           mte = student_result.mte 
+                        else:
+                           student_result.mte = mte
+                           update_fields.append('mte') 
+                           
+                        if student_result.average != average:
+                           student_result.average = average
+                           update_fields.append('average')   
+                           
+                        if student_result.grade != grade:
+                           student_result.grade = grade
+                           update_fields.append('grade')
+                        if student_result.remark != remark:
+                           student_result.remark = remark
+                           update_fields.append('remark')
+                        if student_result.full_name != f"{first_name} {last_name}":
+                           student_result.full_name = f"{first_name} {last_name}"
+                           update_fields.append('full_name')
+                        if student_result.result_summary != f", {subject} = {subject_result}":
+                           student_result.result_summary = f", {subject} = {subject_result}"
+                           update_fields.append('result_summary')
+
+                # Update the fields in the database if needed
+                        if update_fields:
+                           student_result.position = random.uniform(1, 100)  # Update position with random value
+                           
+                           
+                           
+                           
+                           student_result.save(update_fields=update_fields)    
+                    
+                    
+                    
+                    
+                    
                     
                     groups = StudentsResult.objects.values(
                         'registration_number',
@@ -505,5 +584,3 @@ def save_assessment2(request):
         return redirect('admin:index')  # Redirect to the admin homepage
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
