@@ -161,10 +161,6 @@ def add_results_view(request):
                            student_result.mte = mte
                            update_fields.append('mte') 
                            
-                    
-                           
-                          
-                           
                 
                         if student_result.full_name != f"{first_name} {last_name}":
                            student_result.full_name = f"{first_name} {last_name}"
@@ -188,8 +184,10 @@ def add_results_view(request):
                         if valid_values:
                            total = sum(valid_values)
                            average = total / len(valid_values)  
-                           print(average)
-                           if 80 <= subject_result <= 100:
+                           
+                           
+                           
+                           if 80 <= average <= 100:
                               grade = 'A'
                               remark = 'Excellent'
                               if student_result.grade != grade:
@@ -199,7 +197,7 @@ def add_results_view(request):
                                  student_result.remark = remark
                                  update_fields.append('remark')
                                             
-                           elif 70 <= subject_result < 79:
+                           elif 70 <= average < 79:
                               grade = 'B' 
                               remark = 'Very good'  
                               if student_result.grade != grade:
@@ -208,7 +206,7 @@ def add_results_view(request):
                               if student_result.remark != remark:
                                  student_result.remark = remark
                                  update_fields.append('remark')  
-                           elif 60 <= subject_result < 69:
+                           elif 60 <= average < 69:
                               grade = 'C'
                               remark = 'Good'  
                               if student_result.grade != grade:
@@ -217,7 +215,7 @@ def add_results_view(request):
                               if student_result.remark != remark:
                                  student_result.remark = remark
                                  update_fields.append('remark')
-                           elif 50 <= subject_result < 59:
+                           elif 50 <= average < 59:
                               grade = 'D'
                               remark = 'Average'
                               if student_result.grade != grade:
@@ -227,7 +225,7 @@ def add_results_view(request):
                                  student_result.remark = remark
                                  update_fields.append('remark')
                             
-                           elif 40 <= subject_result < 49:
+                           elif 40 <= average < 49:
                               grade = 'E'
                               remark = 'Satisfactory'  
                               if student_result.grade != grade:
@@ -237,7 +235,7 @@ def add_results_view(request):
                                  student_result.remark = remark
                                  update_fields.append('remark')
                                  
-                           elif 35 <= subject_result < 39:
+                           elif 35 <= average < 39:
                               grade = 'S'
                               remark = 'Subsidiary'  
                               if student_result.grade != grade:
@@ -616,11 +614,17 @@ def save_assessment2(request):
         # Extract basic student info from hidden fields
         registration_number = request.POST.get("registration_number")
         full_name = request.POST.get("full_name")
-        entry_year = request.POST.get("entry_year")
+        entry_year_ = request.POST.get("entry_year")
         entry_term = request.POST.get("entry_term")
         entry_programme = request.POST.get("entry_programme")
         entry_class = request.POST.get("entry_class")
         stream_name = request.POST.get("stream_name")
+        
+        entry_year = entry_year_.split(' ')[0]
+      
+        
+      
+        
 
         # Iterate over assessments and either update or insert
         for key, value in request.POST.items():

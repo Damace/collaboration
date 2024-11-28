@@ -125,10 +125,10 @@ def download_assessment(request, registration_number, academic_year, term):
     grade_to_point = {'A': 1, 'B': 2, 'C': 3,'D':4,'E':5,'S':6,'F':7}
 
     # Subjects to exclude
-    # excluded_subjects = ['GENERAL STUDIES', 'BASIC APPLIED MATHEMATICS']
+    excluded_subjects = ['GENERAL STUDIES', 'BASIC APPLIED MATHEMATICS']
     
     
-    excluded_subjects = ['GENERAL STUDY', 'BASIC APPLIED MATHEMATICS']
+    # excluded_subjects = ['GENERAL STUDY', 'BASIC APPLIED MATHEMATICS']
     grade_column = StudentsResult.objects.filter(
     registration_number=registration_number,
     entry_year=academic_year,
@@ -190,8 +190,8 @@ def download_assessment(request, registration_number, academic_year, term):
         'date': date,
         'academic_year': academic_year,
         'term': term,
-        'total_average': total_average,
-        'average': total_avg_per_row,
+        'total_average': round(total_average, 1),
+        'average': round(total_avg_per_row,1),
         'position':random.randint(1, 186),
         'outOff':random.randint(184, 186),
         'point':total_points,
