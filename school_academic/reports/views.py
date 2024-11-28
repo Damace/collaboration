@@ -125,9 +125,10 @@ def download_assessment(request, registration_number, academic_year, term):
     grade_to_point = {'A': 1, 'B': 2, 'C': 3,'D':4,'E':5,'S':6,'F':7}
 
     # Subjects to exclude
-    excluded_subjects = ['GENERAL STUDIES', 'BASIC APPLIED MATHEMATICS']
-
-    # Query the grade column
+    # excluded_subjects = ['GENERAL STUDIES', 'BASIC APPLIED MATHEMATICS']
+    
+    
+    excluded_subjects = ['GENERAL STUDY', 'BASIC APPLIED MATHEMATICS']
     grade_column = StudentsResult.objects.filter(
     registration_number=registration_number,
     entry_year=academic_year,
@@ -150,18 +151,18 @@ def download_assessment(request, registration_number, academic_year, term):
         
         # Determine division based on total points
         
-        if 3<= total_points <=9:
-           division = 'I'
-        elif 10<= total_points <=12:
+    if 3<= total_points <=9:
+         division = 'I'
+    elif 10<= total_points <=12:
           division = 'II'
-        elif 13<= total_points <=17:
+    elif 13<= total_points <=17:
           division = 'III'
-        elif 18<= total_points <=19:
+    elif 18<= total_points <=19:
           division = 'IV'
-        elif 20<= total_points <=21:
-          division = 'O'  
-        else:
-          division = ''
+    elif 20<= total_points <=21:
+          division = '0'  
+    else:
+          division = '0'
     
    
     
@@ -194,7 +195,7 @@ def download_assessment(request, registration_number, academic_year, term):
         'position':random.randint(1, 186),
         'outOff':random.randint(184, 186),
         'point':total_points,
-        'division':division
+        'division':division,
     }
     
 
