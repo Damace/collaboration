@@ -146,8 +146,6 @@ def download_assessment(request, registration_number, academic_year, term):
            continue
         # Get the point for the grade, default to 0 if grade is not in the mapping
         point = grade_to_point.get(grade, 0)
-        
-        print(f"Subject: {subject_name}, Grade: {grade}, Point: {point}")
         total_points += point
         
         # Determine division based on total points

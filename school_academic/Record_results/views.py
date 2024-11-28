@@ -83,8 +83,12 @@ def add_results_view(request):
                             remark = 'Average'
                             
                     elif 40 <= subject_result < 49:
-                            grade = 'D'
+                            grade = 'E'
                             remark = 'Satisfactory'  
+                     
+                    elif 35 <= subject_result < 39:
+                            grade = 'S'
+                            remark = 'Subsidiary' 
                     else:
                             grade = 'F'
                             remark = 'Fail' 
@@ -224,7 +228,7 @@ def add_results_view(request):
                                  update_fields.append('remark')
                             
                            elif 40 <= subject_result < 49:
-                              grade = 'D'
+                              grade = 'E'
                               remark = 'Satisfactory'  
                               if student_result.grade != grade:
                                  student_result.grade = grade
@@ -232,6 +236,18 @@ def add_results_view(request):
                               if student_result.remark != remark:
                                  student_result.remark = remark
                                  update_fields.append('remark')
+                                 
+                           elif 35 <= subject_result < 39:
+                              grade = 'S'
+                              remark = 'Subsidiary'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')    
+                                 
+                                 
                            else:
                               grade = 'F'
                               remark = 'Fail' 
