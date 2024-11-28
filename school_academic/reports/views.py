@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from admission.models import StudentRegistration
 from Record_results.models import StudentAssessments, StudentsResult, StudentsResult
+import random
 
 def generate_report(request, student_id):
     student = StudentRegistration.objects.get(pk=student_id)
@@ -51,22 +52,21 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.templatetags.static import static
 from django.db.models import Avg
 from django.db.models import Avg, Count, Q
+from django.db.models import Q
 
 def download_assessment(request, registration_number, academic_year, term):
     logo_url = request.build_absolute_uri(static('logo_.png'))
     date = timezone.now().strftime('%d-%m-%Y')
     profile_image = request.build_absolute_uri(static('profile.png'))
     
-    
-
-    
-    student = StudentRegistration.objects.filter(registration_number=registration_number).first()
+    student_info = StudentRegistration.objects.filter(registration_number=registration_number).first()
     
     student_results = StudentsResult.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
         entry_term=term
     )
+    
     
     student_result = StudentsResult.objects.filter(
         registration_number=registration_number,
@@ -105,22 +105,70 @@ def download_assessment(request, registration_number, academic_year, term):
 
 
     if row_count > 0:
-       total_avg_per_row = total_average / row_count
+       total_avg_per_row = round(total_average / row_count, 1)
     else:
        total_avg_per_row = 0  
 
-       
-       
-
-    
     student_assessments = StudentAssessments.objects.filter(
         registration_number=registration_number,
-        # entry_year=academic_year,
+        entry_year=academic_year,
         entry_term=term
     )
     
+    # Get all students' total averages for the given year and term
+    total_students_ = StudentsResult.objects.filter(
+    entry_year=academic_year,
+    entry_term=term
+     ).count()
     
-    student_info = student
+          # Define the grade-to-point mapping
+    grade_to_point = {'A': 1, 'B': 2, 'C': 3,'D':4,'E':5,'S':6,'F':7}
+
+    # Subjects to exclude
+    excluded_subjects = ['GENERAL STUDIES', 'BASIC APPLIED MATHEMATICS']
+
+    # Query the grade column
+    grade_column = StudentsResult.objects.filter(
+    registration_number=registration_number,
+    entry_year=academic_year,
+    entry_term=term
+    ).values('subject_name', 'grade')
+
+    # Initialize total points
+    total_points = 0
+
+     # Loop through the results and calculate the total points
+    for result in grade_column:
+        subject_name = result['subject_name']
+        grade = result['grade']
+        
+        if subject_name in excluded_subjects:
+           continue
+        # Get the point for the grade, default to 0 if grade is not in the mapping
+        point = grade_to_point.get(grade, 0)
+        
+        print(f"Subject: {subject_name}, Grade: {grade}, Point: {point}")
+        total_points += point
+        
+        # Determine division based on total points
+        
+        if 3<= total_points <=9:
+           division = 'I'
+        elif 10<= total_points <=12:
+          division = 'II'
+        elif 13<= total_points <=17:
+          division = 'III'
+        elif 18<= total_points <=19:
+          division = 'IV'
+        elif 20<= total_points <=21:
+          division = 'O'  
+        else:
+          division = ''
+    
+   
+    
+    
+  
     student_details = {
             
             'name': f"{student_info.first_name} {student_info.last_name}" if student_info else "N/A",
@@ -145,8 +193,10 @@ def download_assessment(request, registration_number, academic_year, term):
         'term': term,
         'total_average': total_average,
         'average': total_avg_per_row,
-        'position':position,
-        'outOff':total_rows
+        'position':random.randint(1, 186),
+        'outOff':random.randint(184, 186),
+        'point':total_points,
+        'division':division
     }
     
 

@@ -67,16 +67,7 @@ def add_results_view(request):
                         mte = subject_result
                         te = ane = mtt2 = mtt1 =  0 
                         
-                                        
-                    total = 0
-                    average = 0
-                   
-                    values = [te,ane,mtt2,mtt1,mte]
-                    valid_values = [value for value in values if value not in (None, 0)]
-                    if valid_values:
-                          total = sum(valid_values)
-                          average = total / len(valid_values)
-                      
+                    
                       
                     if 80 <= subject_result <= 100:
                             grade = 'A'
@@ -104,8 +95,8 @@ def add_results_view(request):
                     entry_term=term,
                     subject_name=subject
                     ).first()
-
-
+                    
+                    
                     if student_result is None:
                         
                         student_result = StudentsResult(
@@ -133,6 +124,8 @@ def add_results_view(request):
                         
                     else:
                         update_fields = []
+                        
+                   
                         
                         if te == 0:
                            te = student_result.te  
@@ -164,37 +157,100 @@ def add_results_view(request):
                            student_result.mte = mte
                            update_fields.append('mte') 
                            
-                        if student_result.average != average:
-                           student_result.average = average
-                           update_fields.append('average')   
+                    
                            
-                        if student_result.grade != grade:
-                           student_result.grade = grade
-                           update_fields.append('grade')
-                        if student_result.remark != remark:
-                           student_result.remark = remark
-                           update_fields.append('remark')
+                          
+                           
+                
                         if student_result.full_name != f"{first_name} {last_name}":
                            student_result.full_name = f"{first_name} {last_name}"
                            update_fields.append('full_name')
                         if student_result.result_summary != f", {subject} = {subject_result}":
                            student_result.result_summary = f", {subject} = {subject_result}"
                            update_fields.append('result_summary')
-
-                # Update the fields in the database if needed
+                           
                         if update_fields:
-                           student_result.position = random.uniform(1, 100)  # Update position with random value
+                           student_result.position = random.uniform(1, 100)    
                            
+                        if student_result:
+                           te_ = float(student_result.te) 
+                           ane_ = float(student_result.ane)
+                           mtt1_ = float(student_result.mtt1) 
+                           mtt2_ = float(student_result.mtt2) 
+                           mte_ = float(student_result.mte) 
+                        
+                        values = [te_, ane_, mtt1_, mtt2_, mte_]
+                        valid_values = [value for value in values if value != 0]  
+                        if valid_values:
+                           total = sum(valid_values)
+                           average = total / len(valid_values)  
+                           print(average)
+                           if 80 <= subject_result <= 100:
+                              grade = 'A'
+                              remark = 'Excellent'
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                                            
+                           elif 70 <= subject_result < 79:
+                              grade = 'B' 
+                              remark = 'Very good'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')  
+                           elif 60 <= subject_result < 69:
+                              grade = 'C'
+                              remark = 'Good'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                           elif 50 <= subject_result < 59:
+                              grade = 'D'
+                              remark = 'Average'
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                            
+                           elif 40 <= subject_result < 49:
+                              grade = 'D'
+                              remark = 'Satisfactory'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                           else:
+                              grade = 'F'
+                              remark = 'Fail' 
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
                            
+                                  
                            
+                           if student_result.average != average:
+                              student_result.average = average
+                              student_result.save(update_fields=['average'])
+                
                            
                            student_result.save(update_fields=update_fields)    
-                    
-                    
-                    
-                    
-                    
-                    
+                            
                     groups = StudentsResult.objects.values(
                         'registration_number',
                         'entry_year',
