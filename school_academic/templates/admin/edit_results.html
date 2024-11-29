@@ -1,0 +1,301 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{% static 'vendors/iconfonts/font-awesome/css/all.min.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css'%}">
+  <link rel="stylesheet" href="{% static 'css/style.css'%}">
+</head>
+
+<body>
+  <div class="container-scroller" >
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row default-layout-navbar" >
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center" style="background-color:#357ca5">
+       <label style="font-weight:bold;color:#ffffff">Kondoa Girls High School</label>
+     
+     
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-stretch" style="background-color:#3c8dbc">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <span class="fas fa-bars"></span>
+        </button>
+        <ul class="navbar-nav">
+          <li class="nav-item nav-search d-none d-md-flex">
+            <div class="nav-link">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                 
+                </div>
+               
+              </div>
+            </div>
+          </li>
+        </ul>
+     
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+          <span class="fas fa-bars"></span>
+        </button>
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_settings-panel.html -->
+    
+    
+      <!-- partial -->
+      <!-- partial:partials/_sidebar.html -->
+      <nav class="sidebar sidebar-offcanvas" id="sidebar" style="background-color:#1a2226">
+        <ul class="nav">
+          <li class="nav-item nav-profile">
+            <div class="nav-link">
+             
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin:index' %}">
+              <i class="fa fa-home menu-icon"></i>
+              <span class="menu-title"  style="font-weight:bold;color:#ffffff:hover:color:red">Dashboard</span>
+            </a>
+          </li>
+         </ul>
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="page-header">
+           
+          </div>
+
+          {% block content %}
+
+{% if error_message %}
+  <p class="alert alert-warning">{{ error_message }}</p>
+{% else %}
+  {% if filtered_students %}
+        <form method="post" action="{% url 'add_results' %}" id="student-form"> 
+        {% comment %} <form method="post" action="{% url 'custom_admin_login' %}">  {% endcomment %}
+
+      {% csrf_token %}
+
+      <fieldset>
+        <legend><small>Edit students results</small></legend>
+
+      <!-- Hidden Fields to Store Selected Criteria -->
+      <input type="hidden" name="selected_academic_year" value="{{ selected_academic_year }}">
+      <input type="hidden" name="selected_term" value="{{ selected_term }}">
+      <input type="hidden" name="selected_programme" value="{{ programme }}">
+      <input type="hidden" name="selected_class" value="{{ selected_class }}">
+      <input type="hidden" name="selected_stream" value="{{ selected_stream }}">
+      <input type="hidden" name="selected_exams" value="{{ selected_exams }}">
+      <input type="hidden" name="selected_subject_code" value="{{selected_subject_code}}">
+      <input type="hidden" name="selected_subject" value="{{ subject }}">
+
+
+      
+
+
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-md-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                 
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small>Exam type</small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold">{{selected_exams}}</p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small></small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold"></p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small>Subject</small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold">{{subject}}</p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small></small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold"></p>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small></small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold"></p>
+                  </div>
+                </div>
+
+                
+                <div class="d-flex align-items-center">
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small></small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold"></p>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                  <div class="ml-4">
+                    <h5 class="mb-0"><small></small></h5>
+                    <p class="mb-0" style="color:#650000;font-weight:bold"></p>
+                  </div>
+                </div>
+
+
+                <div class="d-flex align-items-center">
+                  <div class="ml-4">
+                    <button type="submit" class="btn btn-success">Update Result</button>
+                  </div>
+                </div>
+
+
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="order-listing" class="table" width="100%">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="select-all" /> Select All</th>
+                  <th><small><b>Reg. Number</small></b></th>
+                  <th><small><b>Full name</small></b></th>
+                  <th style="color:Red"><small><b>Enter new result for {{ subject}}</b></small></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for student in filtered_students %}
+                  <tr>
+                    <td>
+                      <input type="checkbox" name="selected_students" value="{{ student.id }}" class="select-student" />
+                      <input type="hidden" name="student_registration_number_{{ student.id }}" value="{{ student.registration_number }}">
+                      <input type="hidden" name="student_first_name_{{ student.id }}" value="{{ student.full_name }}">
+       
+                    </td>
+                    <td>{{ student.registration_number }}</td>
+                    <td>{{ student.full_name }}</td>
+                  
+                    <td>
+                      <input type="text" name="result_{{ student.id }}" placeholder="Enter Result" class="form-control" />
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </fieldset>
+    </form>
+  {% else %}
+    <p>No students available for the selected criteria.</p>
+  {% endif %}
+{% endif %}
+
+<script>
+  document.getElementById('student-form').addEventListener('submit', function (event) {
+    const checkboxes = document.querySelectorAll('.select-student');
+    const atLeastOneChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+    if (!atLeastOneChecked) {
+      event.preventDefault(); // Prevent form submission
+      alert('Please select at least one student who has filled results.');
+    }
+  });
+</script>
+
+<script>
+  // JavaScript to handle Select All functionality
+  document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.select-student');
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = this.checked;
+    });
+  });
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+        
+          </div>
+    
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+
+ 
+  <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'vendors/js/vendor.bundle.addons.js' %}"></script>
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/misc.js' %}"></script>
+  <script src="{% static 'js/settings.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <script src="{% static 'js/dashboard.js' %}"></script>
+  <script src="{% static 'js/chart.js' %}"></script>
+
+ 
+  <script>
+    (function($) {
+'use strict';
+$(function() {
+$('#order-listing').DataTable({
+  "aLengthMenu": [
+    [5, 10, 15, -1],
+    [5, 10, 15, "All"]
+  ],
+  "iDisplayLength": 10,
+  "language": {
+    search: ""
+  }
+});
+$('#order-listing').each(function() {
+  var datatable = $(this);
+  // SEARCH - Add the placeholder for Search and Turn this into in-line form control
+  var search_input = datatable.closest('.dataTables_wrapper').find('div[id$=_filter] input');
+  search_input.attr('placeholder', 'Search');
+  search_input.removeClass('form-control-sm');
+  // LENGTH - Inline-Form control
+  var length_sel = datatable.closest('.dataTables_wrapper').find('div[id$=_length] select');
+  length_sel.removeClass('form-control-sm');
+});
+});
+})(jQuery);
+  </script>
+
+
+</body>
+
+
+</html>

@@ -407,44 +407,72 @@ from django.contrib import admin
 from .models import StudentsResult
 
 class StudentsResultAdmin(admin.ModelAdmin):
+    change_list_template = "admin/edit_students_results.html"
+
+  
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context.update({
+            "academic_year": AcademicYear.objects.all(),
+            "term": Term.objects.all(),
+            "programmes": Programme.objects.all(),
+            "classes": Class.objects.all(),
+            "stream": Stream.objects.all(),
+            "exams": ExamsCategory.objects.all(),
+            "subjects": Subject.objects.all(),
+            "title": "Filter student to",
+        })
+
+        if request.method == "POST":
+            academic_year = request.POST.get("academic_year")
+            term = request.POST.get("term")
+            programme = request.POST.get("programme")
+            new_class = request.POST.get("new_class")
+            stream = request.POST.get("stream")
+            exam = request.POST.get("exam")
+            subject = request.POST.get("subject")
+      
+            filtered_students = StudentsResult.objects.filter(
+                entry_year=academic_year,
+                entry_term=term,
+                entry_programme=programme,
+                entry_class=new_class,
+                stream_name=stream,
+                subject_name=subject,
+            ).order_by('full_name')
+             
+
+            if not filtered_students.exists():
+                extra_context["error_message"] = "There is no Students name in those categories." 
+                return super().changelist_view(request, extra_context=extra_context)
+            else:
+                
+                extra_context["selected_academic_year"] = academic_year
+                extra_context["selected_term"] = term
+                extra_context["programme"] = programme
+                extra_context["selected_class"] = new_class
+                extra_context["selected_stream"] = stream
+                extra_context["subject"] = subject
+                extra_context["selected_subject_code"] = Subject.objects.get(subject_name=subject).subject_code
+                extra_context["filtered_students"] = filtered_students
+                extra_context["selected_exams"] =  exam
+               
+               
+                return render(request, "admin/edit_results.html", extra_context) 
+            # return super().changelist_view(request, extra_context=extra_context)
+        
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+
+    # Render the form with filtered students if not a POST request
+    #   return render(request, 'addresults.html', {'filtered_students': filtered_students})
+
     
     def has_add_permission(self, request):
         return False
     
-    # Display fields in the admin list view
-    list_display = ('registration_number', 'full_name','subject_code', 'subject_name','te', 'ane', 'mtt2', 'mtt1', 'mte')
-    
-    # Search functionality
-    search_fields = ('registration_number', 'full_name', 'subject_name')
-    
-    # Filtering options for the admin panel
-    list_filter = ('entry_year', 'entry_term', 'entry_programme', 'entry_class', 'stream_name', 'grade')
 
-    # Fieldsets for organizing fields in the admin form
-    fieldsets = (
-        (None, {
-            'fields': ('registration_number', 'full_name','subject_code', 'subject_name')
-        }),
-        ('Exams Results', {
-            'fields': ('te', 'ane', 'mtt2', 'mtt1', 'mte','average', 'grade', 'remark'),
-        }),
-        ('Position', {
-            'fields': ('position',),
-        }),
-        ('Meta Info', {
-            'fields': ('entry_year', 'entry_term', 'entry_programme', 'entry_class', 'stream_name'),
-            'classes': ('collapse',),
-        }),
-    )
-
-    # Making fields editable from the list view for quick editing
-    list_editable = ('te', 'ane', 'mtt2', 'mtt1', 'mte')
-
-
-
-
-
-# Register the model with the admin interface
 admin.site.register(StudentsResult, StudentsResultAdmin)
 
 

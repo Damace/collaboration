@@ -82,8 +82,8 @@ class StudentRegistration(models.Model):
     entry_term = models.ForeignKey(Term, on_delete=models.CASCADE)
     entry_programme = models.ForeignKey(Programme, on_delete=models.CASCADE)
     entry_class = models.ForeignKey(Class, on_delete=models.CASCADE)
-    stream_name = models.ForeignKey(Stream, on_delete=models.CASCADE, null=True, blank=True) 
-    subjects = models.ManyToManyField(Subject, blank=True)  # Add this line for subjects
+    stream_name = models.ForeignKey(Stream, on_delete=models.CASCADE) 
+    subjects = models.ManyToManyField(Subject)  # Add this line for subjects
     entry_category = models.ForeignKey(EntryCategory, on_delete=models.CASCADE)
     sponsor_name = models.ForeignKey(Sponsor, on_delete=models.CASCADE)
     registration_number = models.CharField(max_length=20, unique=True)
