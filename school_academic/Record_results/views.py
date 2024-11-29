@@ -358,6 +358,347 @@ def add_results_view(request):
         messages.error(request, "Invalid request method.")
         return redirect('admin:index')  # Redirect back if not POST
 
+
+
+
+def edit_results_view(request):
+    if request.method == 'POST':
+       
+        academic_year = request.POST.get('selected_academic_year')
+        term = request.POST.get('selected_term')
+        programme = request.POST.get('selected_programme')
+        selected_stream = request.POST.get('selected_stream')
+        selected_class = request.POST.get('selected_class')
+        subject_code = request.POST.get('selected_subject_code')
+        subject = request.POST.get('selected_subject')
+        exam_type = request.POST.get('selected_exams')
+        
+        
+
+        # Get selected students
+        selected_students = request.POST.getlist('selected_students')
+        
+    
+        
+        try:
+            with transaction.atomic():  # Ensure atomic database transactions
+                for student_id in selected_students:
+                    # Retrieve student-specific data
+                    registration_number = request.POST.get(f'student_registration_number_{student_id}')
+                    first_name = request.POST.get(f'student_first_name_{student_id}')
+                    subject_result = float(request.POST.get(f'result_{student_id}','') or '')
+                    
+                    
+                    
+                    if exam_type == 'TERMINAL EXAMINATION':
+                        te = subject_result
+                        ane = mtt2 = mtt1 = mte =  0  
+                 
+                    elif exam_type == 'ANNUAL EXAMINATION':
+                        ane = subject_result
+                        te = mtt2 = mtt1 = mte =  0  
+                    elif exam_type == 'MONTHLY TEST 2':
+                        mtt2 = subject_result
+                        te = ane = mtt1 = mte =  0  
+                    elif exam_type == 'MONTHLY TEST 1':
+                        mtt1 = subject_result
+                        te = ane = mtt2 = mte =  0  
+                    elif exam_type == 'MIDTERM EXAMINATION':
+                        mte = subject_result
+                        te = ane = mtt2 = mtt1 =  0 
+                        
+                    
+                      
+                    if 80 <= subject_result <= 100:
+                            grade = 'A'
+                            remark = 'Excellent'
+                    elif 70 <= subject_result < 79:
+                            grade = 'B' 
+                            remark = 'Very good'    
+                    elif 60 <= subject_result < 69:
+                            grade = 'C'
+                            remark = 'Good'  
+                    elif 50 <= subject_result < 59:
+                            grade = 'D'
+                            remark = 'Average'
+                            
+                    elif 40 <= subject_result < 49:
+                            grade = 'E'
+                            remark = 'Satisfactory'  
+                     
+                    elif 35 <= subject_result < 39:
+                            grade = 'S'
+                            remark = 'Subsidiary' 
+                    else:
+                            grade = 'F'
+                            remark = 'Fail' 
+
+                    student_result = StudentsResult.objects.filter(
+                    registration_number=registration_number,
+                    entry_year=academic_year,
+                    entry_term=term,
+                    subject_name=subject
+                    ).first()
+                    
+                    
+                    if student_result is None:
+                        
+                        student_result = StudentsResult(
+                        registration_number=registration_number,
+                        entry_year=academic_year,
+                        entry_term=term,
+                        entry_programme=programme,
+                        stream_name=selected_stream,
+                        entry_class=selected_class,
+                        subject_name=subject,
+                        subject_code = subject_code,
+                        te=te ,
+                        ane=ane,
+                        mtt2=mtt2,
+                        mtt1=mtt1,
+                        mte=mte,
+                        average=subject_result,
+                        grade=grade,
+                        remark=remark,
+                        full_name=first_name,
+                        result_summary=f", {subject} = {subject_result}",
+                        position=random.uniform(1, 100)  # Set position to a random value
+                      )
+                        student_result.save() 
+                        
+                    else:
+                        update_fields = []
+                        
+                   
+                        
+                        if te == 0:
+                           te = student_result.te  
+                        else:
+                           student_result.te = te
+                           update_fields.append('te')
+                 
+                        if ane == 0:
+                           ane = student_result.ane  
+                        else:
+                           student_result.ane = ane
+                           update_fields.append('ane')    
+                 
+                        if mtt2 == 0:
+                           mtt2 = student_result.mtt2  
+                        else:
+                           student_result.mtt2 = mtt2
+                           update_fields.append('mtt2')  
+                    
+                        if mtt1 == 0:
+                           mtt1 = student_result.mtt1 
+                        else:
+                           student_result.mtt1 = mtt1
+                           update_fields.append('mtt1')  
+                    
+                        if mte == 0:
+                           mte = student_result.mte 
+                        else:
+                           student_result.mte = mte
+                           update_fields.append('mte') 
+                           
+                
+                        if student_result.full_name != first_name:
+                           student_result.full_name = first_name
+                           update_fields.append('full_name')
+                        if student_result.result_summary != f", {subject} = {subject_result}":
+                           student_result.result_summary = f", {subject} = {subject_result}"
+                           update_fields.append('result_summary')
+                           
+                        if update_fields:
+                           student_result.position = random.uniform(1, 100)    
+                           
+                        if student_result:
+                           te_ = float(student_result.te) 
+                           ane_ = float(student_result.ane)
+                           mtt1_ = float(student_result.mtt1) 
+                           mtt2_ = float(student_result.mtt2) 
+                           mte_ = float(student_result.mte) 
+                        
+                        values = [te_, ane_, mtt1_, mtt2_, mte_]
+                        valid_values = [value for value in values if value != 0]  
+                        if valid_values:
+                           total = sum(valid_values)
+                           average = total / len(valid_values)  
+                           
+                           
+                           
+                           if 80 <= average <= 100:
+                              grade = 'A'
+                              remark = 'Excellent'
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                                            
+                           elif 70 <= average < 79:
+                              grade = 'B' 
+                              remark = 'Very good'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')  
+                           elif 60 <= average < 69:
+                              grade = 'C'
+                              remark = 'Good'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                           elif 50 <= average < 59:
+                              grade = 'D'
+                              remark = 'Average'
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                            
+                           elif 40 <= average < 49:
+                              grade = 'E'
+                              remark = 'Satisfactory'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                                 
+                           elif 35 <= average < 39:
+                              grade = 'S'
+                              remark = 'Subsidiary'  
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')    
+                                 
+                                 
+                           else:
+                              grade = 'F'
+                              remark = 'Fail' 
+                              if student_result.grade != grade:
+                                 student_result.grade = grade
+                                 update_fields.append('grade')
+                              if student_result.remark != remark:
+                                 student_result.remark = remark
+                                 update_fields.append('remark')
+                           
+                                  
+                           
+                           if student_result.average != average:
+                              student_result.average = average
+                              student_result.save(update_fields=['average'])
+                
+                           
+                           student_result.save(update_fields=update_fields)    
+                            
+                    groups = StudentsResult.objects.values(
+                        'registration_number',
+                        'entry_year',
+                        'entry_term',
+                        'entry_programme',
+                        'entry_class',
+                        'stream_name',
+                        'full_name',
+                        'average',
+                        'grade',
+                        'remark',
+                        'position'
+                        ).distinct()
+                    
+                    for group in groups:
+                        
+                        results = StudentsResult.objects.filter(
+                            registration_number=group['registration_number'],
+                            entry_year=group['entry_year'],
+                            entry_term=group['entry_term']
+                              )
+
+           
+                        subjects = ", ".join(result.subject_name for result in results)
+                        
+                        valid_scores = []
+                        for result in results:
+                            if result.te and float(result.te) > 0:
+                                valid_scores.append(str(float(result.te)))
+                            if result.ane and float(result.ane) > 0:
+                                valid_scores.append(str(float(result.ane)))
+                            if result.mtt2 and float(result.mtt2) > 0:
+                                valid_scores.append(str(float(result.mtt2)))
+                            if result.mtt1 and float(result.mtt1) > 0:
+                                valid_scores.append(str(float(result.mtt1)))
+                            if result.mte and float(result.mte) > 0:
+                                valid_scores.append(str(float(result.mte)))
+
+
+                            scores = ", ".join(valid_scores)  # This is now a string, not a list
+ 
+
+                       
+                        # scores = ", ".join(str(result.te) for result in results)
+                        
+                        
+                        existing_record = ClassResults.objects.filter(
+                        registration_number=group['registration_number'],
+                        academic_year=group['entry_year'],
+                        term=group['entry_term'],
+                       full_name=group['full_name'],
+                       ).first()
+
+                    if existing_record:
+                        existing_record.subjects = subjects
+                        existing_record.scores = scores
+                        existing_record.average = group['average']
+                        existing_record.grade = group['grade']
+                        existing_record.remark = group['remark']
+                        existing_record.position = group['position']
+                        existing_record.save()
+
+                    else:
+                        ClassResults.objects.create(
+                        registration_number=group['registration_number'],
+                        academic_year=group['entry_year'],
+                        term=group['entry_term'],
+                        entry_programme=group['entry_programme'],
+                        entry_class=group['entry_class'],
+                        stream_name=group['stream_name'],
+                        full_name=group['full_name'],
+                        subjects=subjects,
+                        scores=scores,
+                        average=group['average'],
+                        grade=group['grade'],
+                       remark=group['remark'],
+                       position=group['position']
+                )
+                        
+                        
+                        
+                   
+            messages.success(request, "Results added successfully!")
+            return redirect('admin:index')  # Redirect to the admin homepage
+
+        except Exception as e:
+            messages.error(request, f"Error adding results: {str(e)}")
+            return redirect('admin:index')  # Redirect back to the results form
+
+    else:
+        messages.error(request, "Invalid request method.")
+        return redirect('admin:index')  # Redirect back if not POST
+
+
  
 
 

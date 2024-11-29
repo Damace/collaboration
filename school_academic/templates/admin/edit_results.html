@@ -78,7 +78,7 @@
   <p class="alert alert-warning">{{ error_message }}</p>
 {% else %}
   {% if filtered_students %}
-        <form method="post" action="{% url 'add_results' %}" id="student-form"> 
+        <form method="post" action="{% url 'edit_results' %}" id="student-form"> 
         {% comment %} <form method="post" action="{% url 'custom_admin_login' %}">  {% endcomment %}
 
       {% csrf_token %}
