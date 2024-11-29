@@ -137,7 +137,7 @@ class ClassResults(models.Model):
     average = models.FloatField(max_length=100)
     grade = models.CharField(max_length=2)
     remark = models.CharField(max_length=100)
-    position = models.IntegerField()
+    position = models.IntegerField(null=True, blank=True)
     
     
 class StudentAssessments(models.Model):
@@ -150,6 +150,7 @@ class StudentAssessments(models.Model):
     entry_class = models.CharField(max_length=50)
     stream_name = models.CharField(max_length=50)
     assessment_name = models.CharField(max_length=100)
+    note = models.CharField(max_length=1000)
     grade = models.CharField(max_length=20)
 
     def __str__(self):

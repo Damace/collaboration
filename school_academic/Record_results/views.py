@@ -122,9 +122,18 @@ def add_results_view(request):
                         remark=remark,
                         full_name=f"{first_name} {last_name}",
                         result_summary=f", {subject} = {subject_result}",
-                        position=random.uniform(1, 100)  # Set position to a random value
                       )
+                        
                         student_result.save() 
+                        
+                        all_results = StudentsResult.objects.filter(
+                                 entry_year=academic_year,
+                                 entry_term=term,
+                                 subject_name=subject
+                                 ).order_by('-average')
+                        for idx, result in enumerate(all_results, start=1):
+                               result.position = idx
+                               result.save()
                         
                     else:
                         update_fields = []
@@ -184,8 +193,6 @@ def add_results_view(request):
                         if valid_values:
                            total = sum(valid_values)
                            average = total / len(valid_values)  
-                           
-                           
                            
                            if 80 <= average <= 100:
                               grade = 'A'
@@ -261,6 +268,18 @@ def add_results_view(request):
                            if student_result.average != average:
                               student_result.average = average
                               student_result.save(update_fields=['average'])
+                              
+                              
+                                    
+                           all_results = StudentsResult.objects.filter(
+                                 entry_year=academic_year,
+                                 entry_term=term,
+                                 subject_name=subject
+                                 ).order_by('-average')
+
+                           for idx, result in enumerate(all_results, start=1):
+                               result.position = idx
+                               result.save()
                 
                            
                            student_result.save(update_fields=update_fields)    
@@ -386,6 +405,7 @@ def edit_results_view(request):
                     # Retrieve student-specific data
                     registration_number = request.POST.get(f'student_registration_number_{student_id}')
                     first_name = request.POST.get(f'student_first_name_{student_id}')
+                    last_name = request.POST.get(f'student_last_name_{student_id}')
                     subject_result = float(request.POST.get(f'result_{student_id}','') or '')
                     
                     
@@ -460,11 +480,20 @@ def edit_results_view(request):
                         average=subject_result,
                         grade=grade,
                         remark=remark,
-                        full_name=first_name,
+                        full_name=f"{first_name} {last_name}",
                         result_summary=f", {subject} = {subject_result}",
-                        position=random.uniform(1, 100)  # Set position to a random value
                       )
+                        
                         student_result.save() 
+                        
+                        all_results = StudentsResult.objects.filter(
+                                 entry_year=academic_year,
+                                 entry_term=term,
+                                 subject_name=subject
+                                 ).order_by('-average')
+                        for idx, result in enumerate(all_results, start=1):
+                               result.position = idx
+                               result.save()
                         
                     else:
                         update_fields = []
@@ -502,8 +531,8 @@ def edit_results_view(request):
                            update_fields.append('mte') 
                            
                 
-                        if student_result.full_name != first_name:
-                           student_result.full_name = first_name
+                        if student_result.full_name != f"{first_name} {last_name}":
+                           student_result.full_name = f"{first_name} {last_name}"
                            update_fields.append('full_name')
                         if student_result.result_summary != f", {subject} = {subject_result}":
                            student_result.result_summary = f", {subject} = {subject_result}"
@@ -524,8 +553,6 @@ def edit_results_view(request):
                         if valid_values:
                            total = sum(valid_values)
                            average = total / len(valid_values)  
-                           
-                           
                            
                            if 80 <= average <= 100:
                               grade = 'A'
@@ -601,6 +628,18 @@ def edit_results_view(request):
                            if student_result.average != average:
                               student_result.average = average
                               student_result.save(update_fields=['average'])
+                              
+                              
+                                    
+                           all_results = StudentsResult.objects.filter(
+                                 entry_year=academic_year,
+                                 entry_term=term,
+                                 subject_name=subject
+                                 ).order_by('-average')
+
+                           for idx, result in enumerate(all_results, start=1):
+                               result.position = idx
+                               result.save()
                 
                            
                            student_result.save(update_fields=update_fields)    
@@ -687,7 +726,7 @@ def edit_results_view(request):
                         
                         
                    
-            messages.success(request, "Results added successfully!")
+            messages.success(request, "Results Updated successfully!")
             return redirect('admin:index')  # Redirect to the admin homepage
 
         except Exception as e:
@@ -697,8 +736,6 @@ def edit_results_view(request):
     else:
         messages.error(request, "Invalid request method.")
         return redirect('admin:index')  # Redirect back if not POST
-
-
  
 
 
@@ -960,6 +997,7 @@ def save_assessment2(request):
         entry_programme = request.POST.get("entry_programme")
         entry_class = request.POST.get("entry_class")
         stream_name = request.POST.get("stream_name")
+        note = request.POST.get("note")
         
         entry_year = entry_year_.split(' ')[0]
       
@@ -982,6 +1020,7 @@ def save_assessment2(request):
                     entry_year=entry_year,
                     entry_term=entry_term,
                     assessment_name=subject_name,
+                    note=note,
                     defaults={
                         "entry_programme": entry_programme,
                         "entry_class": entry_class,

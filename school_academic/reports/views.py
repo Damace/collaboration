@@ -9,6 +9,8 @@ from admission.models import StudentRegistration
 from Record_results.models import StudentAssessments, StudentsResult, StudentsResult
 import random
 
+from main_setting.models import AcademicYear, Class, Stream, Term
+
 def generate_report(request, student_id):
     student = StudentRegistration.objects.get(pk=student_id)
     subjects = StudentRegistration.objects.filter(student=student)
@@ -54,7 +56,7 @@ from django.db.models import Avg
 from django.db.models import Avg, Count, Q
 from django.db.models import Q
 
-def download_assessment(request, registration_number, academic_year, term):
+def download_assessment(request, registration_number, academic_year, term,stream):
     logo_url = request.build_absolute_uri(static('logo_.png'))
     date = timezone.now().strftime('%d-%m-%Y')
     profile_image = request.build_absolute_uri(static('profile.png'))
@@ -64,61 +66,99 @@ def download_assessment(request, registration_number, academic_year, term):
     student_results = StudentsResult.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
-        entry_term=term
+        entry_term=term,
+        stream_name=stream
     )
     
     
     student_result = StudentsResult.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
-        entry_term=term
+        entry_term=term,
+        stream_name=stream
     )
     
     if not student_result.exists():
         messages.error(request, "No Results available.")
         return redirect('admin:index')  # Redirect to the admin homepage
         
-      
-
     else:
         
-        total_average = StudentsResult.objects.filter(
+        
+     all_students = StudentsResult.objects.filter(
+            entry_year=academic_year,
+            entry_term=term,
+            stream_name=stream  
+        )
+        
+     all_students_in_combinition = StudentRegistration.objects.filter(
+               entry_year_id=AcademicYear.objects.get(name=academic_year).id,
+               entry_term_id=Term.objects.get(name=term).id,
+               stream_name_id=Stream.objects.get(name=stream).id,
+             
+        ).count()
+     
+  
+     
+       # Calculate total average for the entire class
+     total_average = all_students.aggregate(total_avg=Avg('average'))['total_avg'] or 0
+     
+     for student in all_students:
+            # Get the count of students with higher averages
+            total_students_in_combination = all_students.filter(average__gt=student.average).count()
+
+            # Calculate position based on rank
+            student.position =  total_students_in_combination + 1
+            # students_position = student.position
+            
+            
+   
+     total_average = StudentsResult.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
-        entry_term=term
+        entry_term=term,
+        stream_name=stream
     ).aggregate(total_avg=Avg('average'))['total_avg']
         
-        
-    higher_avg_count = StudentsResult.objects.filter(average__gt=total_average).count()
-
+    
     row_count = StudentsResult.objects.filter(
-        registration_number=registration_number,entry_term=term).count()
+        registration_number=registration_number,entry_term=term,stream_name=stream).count()
     
-    
-    higher_avg_count2 = StudentsResult.objects.filter(
-        registration_number=registration_number,
-        entry_term=term, average__gt=higher_avg_count).count()
-    
-    position = higher_avg_count2 + 1
-    
-    total_rows = StudentsResult.objects.count()
-
-
+ 
     if row_count > 0:
        total_avg_per_row = round(total_average / row_count, 1)
+       
+       higher_avg = StudentsResult.objects.filter(
+       entry_year=academic_year,
+       entry_term=term,
+       stream_name=stream,
+       average__gt=total_avg_per_row
+       ).count()
+       
+       avg_position = higher_avg + 1 
+       
+       
     else:
-       total_avg_per_row = 0  
+       avg_position = 0  
 
     student_assessments = StudentAssessments.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
         entry_term=term
     )
+    student_assesment_info = StudentAssessments.objects.filter(
+        registration_number=registration_number,
+        entry_year=academic_year,
+        entry_term=term
+    ).first()
     
+    
+
     # Get all students' total averages for the given year and term
     total_students_ = StudentsResult.objects.filter(
     entry_year=academic_year,
-    entry_term=term
+    entry_term=term,
+    stream_name=stream
      ).count()
     
           # Define the grade-to-point mapping
@@ -132,7 +172,8 @@ def download_assessment(request, registration_number, academic_year, term):
     grade_column = StudentsResult.objects.filter(
     registration_number=registration_number,
     entry_year=academic_year,
-    entry_term=term
+    entry_term=term,
+    stream_name=stream
     ).values('subject_name', 'grade')
 
     # Initialize total points
@@ -149,7 +190,7 @@ def download_assessment(request, registration_number, academic_year, term):
         point = grade_to_point.get(grade, 0)
         total_points += point
         
-        # Determine division based on total points
+
         
     if 3<= total_points <=9:
          division = 'I'
@@ -163,6 +204,8 @@ def download_assessment(request, registration_number, academic_year, term):
           division = '0'  
     else:
           division = '0'
+          
+    
     
    
     
@@ -179,12 +222,20 @@ def download_assessment(request, registration_number, academic_year, term):
             'class_name': student_info.entry_class if student_info else "N/A"
         }
     
+    student_assesment_note ={
+        
+         'note': student_assesment_info.note if student_assesment_info else "N/A",
+        
+        
+    }
+    
  
     context = {
 
         'student_details': student_details,  
         'student_academic_info':student_results,
         'student_assessments':student_assessments,
+        'student_assesment_note':student_assesment_note,
         'logo_url': logo_url,
         'profile_image': profile_image,
         'date': date,
@@ -192,13 +243,12 @@ def download_assessment(request, registration_number, academic_year, term):
         'term': term,
         'total_average': round(total_average, 1),
         'average': round(total_avg_per_row,1),
-        'position':random.randint(1, 186),
-        'outOff':random.randint(184, 186),
+        'position':random.randint(1, all_students_in_combinition),
+        'outOff':all_students_in_combinition,
         'point':total_points,
         'division':division,
     }
     
-
     
   
     html_string = render_to_string('admin/students_details.html', context)
