@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from admission.models import StudentRegistration
-from Record_results.models import StudentAssessments, StudentsResult, StudentsResult
+from Record_results.models import StudentAssessments, StudentNote, StudentsPosition, StudentsResult, StudentsResult
 import random
 
 from main_setting.models import AcademicYear, Class, Stream, Term
@@ -100,16 +100,16 @@ def download_assessment(request, registration_number, academic_year, term,stream
      
   
      
-       # Calculate total average for the entire class
+     
      total_average = all_students.aggregate(total_avg=Avg('average'))['total_avg'] or 0
      
      for student in all_students:
-            # Get the count of students with higher averages
+           
             total_students_in_combination = all_students.filter(average__gt=student.average).count()
 
-            # Calculate position based on rank
+       
             student.position =  total_students_in_combination + 1
-            # students_position = student.position
+         
             
             
    
@@ -146,12 +146,31 @@ def download_assessment(request, registration_number, academic_year, term,stream
         entry_year=academic_year,
         entry_term=term
     )
-    student_assesment_info = StudentAssessments.objects.filter(
+    student_assesment_info = StudentNote.objects.filter(
         registration_number=registration_number,
         entry_year=academic_year,
-        entry_term=term
+        entry_term=term,
+        stream_name=stream
+    )
+    last_student_note = student_assesment_info.last()
+    
+    
+    student_position_info = StudentsPosition.objects.filter(
+        registration_number=registration_number,
+        entry_year=academic_year,
+        entry_term=term,
+        stream_name=stream,
     ).first()
     
+    # if student_position_info:
+    #     print(f"Registration Number: {student_position_info.registration_number}")
+    #     print(f"Entry Year: {student_position_info.entry_year}")
+    #     print(f"Entry Term: {student_position_info.entry_term}")
+    #     print(f"Stream Name: {student_position_info.stream_name}")
+    #     print(f"Position: {student_position_info.position}")
+    #     print(f"Total Average: {student_position_info.total_avg}")
+    # else:
+    #     print("No student position information found.")
     
 
     # Get all students' total averages for the given year and term
@@ -207,9 +226,6 @@ def download_assessment(request, registration_number, academic_year, term,stream
           
     
     
-   
-    
-    
   
     student_details = {
             
@@ -224,7 +240,7 @@ def download_assessment(request, registration_number, academic_year, term,stream
     
     student_assesment_note ={
         
-         'note': student_assesment_info.note if student_assesment_info else "N/A",
+         'note': last_student_note.note if last_student_note else "N/A",
         
         
     }
@@ -243,7 +259,7 @@ def download_assessment(request, registration_number, academic_year, term,stream
         'term': term,
         'total_average': round(total_average, 1),
         'average': round(total_avg_per_row,1),
-        'position':random.randint(1, all_students_in_combinition),
+        'position':student_position_info.position,
         'outOff':all_students_in_combinition,
         'point':total_points,
         'division':division,

@@ -17,8 +17,10 @@ from django.db import transaction
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.db import transaction
-from .models import ClassResults, StudentsResult, GradeScale
+from .models import ClassResults, StudentNote, StudentsPosition, StudentsResult, GradeScale
 import random
+from django.db.models import Avg
+from django.db.models import Avg, Count, Q
 
 def add_results_view(request):
     if request.method == 'POST':
@@ -252,7 +254,6 @@ def add_results_view(request):
                                  student_result.remark = remark
                                  update_fields.append('remark')    
                                  
-                                 
                            else:
                               grade = 'F'
                               remark = 'Fail' 
@@ -270,7 +271,7 @@ def add_results_view(request):
                               student_result.save(update_fields=['average'])
                               
                               
-                                    
+                       
                            all_results = StudentsResult.objects.filter(
                                  entry_year=academic_year,
                                  entry_term=term,
@@ -280,10 +281,60 @@ def add_results_view(request):
                            for idx, result in enumerate(all_results, start=1):
                                result.position = idx
                                result.save()
-                
+                           student_result.save(update_fields=update_fields) 
                            
-                           student_result.save(update_fields=update_fields)    
-                            
+  #################################################################################################################################                         
+                           
+                    total_average = StudentsResult.objects.filter(
+                               registration_number=registration_number,
+                               entry_year=academic_year,
+                               entry_term=term,
+                               stream_name=selected_stream
+                               ).aggregate(total_avg=Avg('average'))['total_avg']
+                    if total_average is None:
+                               total_average = 0 
+                               
+                    student_position = StudentsPosition.objects.filter(
+                               registration_number=registration_number,
+                               entry_year=academic_year,
+                               entry_term=term,
+                               stream_name=selected_stream
+                            ).first()
+                    if student_position is None:
+                               student_position = StudentsPosition.objects.get_or_create (
+                               registration_number=registration_number,
+                               entry_year=academic_year,
+                               entry_term=term,
+                               entry_programme=programme,
+                               entry_class=selected_class,
+                               stream_name=selected_stream,
+                               full_name=f"{first_name} {last_name}",
+                               total_avg=total_average,
+                            )
+                               all_avg = StudentsPosition.objects.filter(
+                            entry_year=academic_year,
+                            entry_term=term,
+                            stream_name=selected_stream
+                            ).order_by('-total_avg')
+                               
+                               for idx, result in enumerate(all_avg, start=1):
+                                   result.position = idx
+                                   result.save()
+                                       
+                    else:
+                        student_position.total_avg = round(total_average, 1)
+                        student_position.save()
+                        all_avg = StudentsPosition.objects.filter(
+                            entry_year=academic_year,
+                            entry_term=term,
+                            stream_name=selected_stream
+                            ).order_by('-total_avg')
+
+                        for idx, result in enumerate(all_avg, start=1):
+                            result.position = idx
+                            result.save()
+                 ###################################################################################################################           
+                          
                     groups = StudentsResult.objects.values(
                         'registration_number',
                         'entry_year',
@@ -612,7 +663,6 @@ def edit_results_view(request):
                                  student_result.remark = remark
                                  update_fields.append('remark')    
                                  
-                                 
                            else:
                               grade = 'F'
                               remark = 'Fail' 
@@ -630,7 +680,7 @@ def edit_results_view(request):
                               student_result.save(update_fields=['average'])
                               
                               
-                                    
+                       
                            all_results = StudentsResult.objects.filter(
                                  entry_year=academic_year,
                                  entry_term=term,
@@ -640,10 +690,60 @@ def edit_results_view(request):
                            for idx, result in enumerate(all_results, start=1):
                                result.position = idx
                                result.save()
-                
+                           student_result.save(update_fields=update_fields) 
                            
-                           student_result.save(update_fields=update_fields)    
-                            
+  #################################################################################################################################                         
+                           
+                    total_average = StudentsResult.objects.filter(
+                               registration_number=registration_number,
+                               entry_year=academic_year,
+                               entry_term=term,
+                               stream_name=selected_stream
+                               ).aggregate(total_avg=Avg('average'))['total_avg']
+                    if total_average is None:
+                               total_average = 0 
+                               
+                    student_position = StudentsPosition.objects.filter(
+                               registration_number=registration_number,
+                               entry_year=academic_year,
+                               entry_term=term,
+                               stream_name=selected_stream
+                            ).first()
+                    if student_position is None:
+                               student_position = StudentsPosition.objects.get_or_create (
+                               registration_number=registration_number,
+                               entry_year=academic_year,
+                               entry_term=term,
+                               entry_programme=programme,
+                               entry_class=selected_class,
+                               stream_name=selected_stream,
+                               full_name=f"{first_name} {last_name}",
+                               total_avg=total_average,
+                            )
+                               all_avg = StudentsPosition.objects.filter(
+                            entry_year=academic_year,
+                            entry_term=term,
+                            stream_name=selected_stream
+                            ).order_by('-total_avg')
+                               
+                               for idx, result in enumerate(all_avg, start=1):
+                                   result.position = idx
+                                   result.save()
+                                       
+                    else:
+                        student_position.total_avg = round(total_average, 1)
+                        student_position.save()
+                        all_avg = StudentsPosition.objects.filter(
+                            entry_year=academic_year,
+                            entry_term=term,
+                            stream_name=selected_stream
+                            ).order_by('-total_avg')
+
+                        for idx, result in enumerate(all_avg, start=1):
+                            result.position = idx
+                            result.save()
+                 ###################################################################################################################           
+                          
                     groups = StudentsResult.objects.values(
                         'registration_number',
                         'entry_year',
@@ -736,6 +836,7 @@ def edit_results_view(request):
     else:
         messages.error(request, "Invalid request method.")
         return redirect('admin:index')  # Redirect back if not POST
+
  
 
 
@@ -984,6 +1085,7 @@ from Record_results.models import QueResults, StudentsResult
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib import messages
+from django.db import IntegrityError
 from .models import StudentAssessments, StudentRegistration, StudentsResult
 
 
@@ -1000,27 +1102,21 @@ def save_assessment2(request):
         note = request.POST.get("note")
         
         entry_year = entry_year_.split(' ')[0]
-      
         
-      
-        
-
-        # Iterate over assessments and either update or insert
+        # Iterate over assessments
         for key, value in request.POST.items():
             if key.startswith("grade_"):  # Check for grade fields
-                # Extract assessment ID from the key
                 assessment_id = key.split("_")[1]
                 subject_name = request.POST.get(f"subject_name_{assessment_id}")
                 grade = value
 
-                # Check if a record with the same details exists
+                     # Check if a record with the same details exists
                 assessment, created = StudentAssessments.objects.update_or_create(
                     registration_number=registration_number,
                     full_name=full_name,
                     entry_year=entry_year,
                     entry_term=entry_term,
                     assessment_name=subject_name,
-                    note=note,
                     defaults={
                         "entry_programme": entry_programme,
                         "entry_class": entry_class,
@@ -1029,14 +1125,21 @@ def save_assessment2(request):
                     },
                 )
 
-                # Log the action (optional, for debugging)
-                if created:
-                    print(f"Created new assessment: {assessment}")
-                else:
-                    print(f"Updated existing assessment: {assessment}")
-
-        # Success message
+        # Create student note
+        final_create = StudentNote.objects.create(
+            registration_number=registration_number,
+            full_name=full_name,
+            entry_year=entry_year,
+            entry_term=entry_term,
+            entry_programme=entry_programme,
+            entry_class=entry_class,
+            stream_name=stream_name,
+            note=note
+        )
+        final_create.save()
+        
+      
         messages.success(request, "Students Assessments added successfully!")
         return redirect('admin:index')  # Redirect to the admin homepage
 
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+

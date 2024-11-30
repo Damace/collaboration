@@ -89,6 +89,22 @@ class StudentsResult(models.Model):
         return f"{self.full_name} - {self.subject_name}"
     
     
+
+class StudentsPosition(models.Model):
+    registration_number = models.CharField(max_length=50)
+    entry_year = models.CharField(max_length=20)
+    entry_term = models.CharField(max_length=20)
+    entry_programme = models.CharField(max_length=100)
+    entry_class = models.CharField(max_length=50)
+    stream_name = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=100)
+    total_avg = models.CharField(null=True, blank=True, max_length=10)
+    position = models.IntegerField(null=True, blank=True)
+      
+    def __str__(self):
+        return f"{self.full_name}"    
+    
+    
     
 from django.db import models
 
@@ -150,8 +166,23 @@ class StudentAssessments(models.Model):
     entry_class = models.CharField(max_length=50)
     stream_name = models.CharField(max_length=50)
     assessment_name = models.CharField(max_length=100)
-    note = models.CharField(max_length=1000)
     grade = models.CharField(max_length=20)
 
     def __str__(self):
         return f"{self.full_name} - {self.assessment_name} ({self.grade})"
+
+
+class StudentNote(models.Model):
+    student = models.CharField(max_length=50)
+    registration_number = models.CharField(max_length=50)
+    full_name = models.CharField(max_length=100)
+    entry_year = models.CharField(max_length=20)
+    entry_term = models.CharField(max_length=20)
+    entry_programme = models.CharField(max_length=50)
+    entry_class = models.CharField(max_length=50)
+    stream_name = models.CharField(max_length=50)
+    note = models.CharField(max_length=1000)
+  
+
+    def __str__(self):
+        return f"{self.full_name}"

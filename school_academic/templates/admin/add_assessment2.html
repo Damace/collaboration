@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css'%}">
   <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.addons.css'%}">
   <link rel="stylesheet" href="{% static 'css/style.css'%}">
+  <link rel="stylesheet" href="{% static 'vendors/summernote/dist/summernote-bs4.css'%}">
+
 </head>
 
 <body>
@@ -121,11 +123,37 @@
 
                   
                 <div align="center">
-                  <p style="color:Red;font-weight:bold">Any note</p>
+                
 
-                 
-                <textarea style="width:100%;"  name="note" rows="4" cols="50" required></textarea>
+            
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div class="card">
+                      <div class="card-body">
+                        <h4 class="card-title">Any note</h4>
+                       
+                        <textarea id="simpleMde" name="note" placeholder="Enter your notes here..."></textarea>
 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+               
 
                 </div>
 
@@ -169,6 +197,8 @@
   <script src="{% static 'js/todolist.js' %}"></script>
   <script src="{% static 'js/dashboard.js' %}"></script>
   <script src="{% static 'js/chart.js' %}"></script>
+  <script src="{% static 'js/editorDemo.js' %}"></script>
+
 
  
   <script>

@@ -250,14 +250,20 @@
     <style>
        
         .note {
-            border: 2px dashed red;
+            
             padding: 10px;
             margin-bottom: 20px;
             background-color: #f9f9f9;
 
-            width: 95%;
+            width: 100%;
             height: 30% 
             padding: 8px;
+
+            word-wrap: break-word; /* Ensures long words or text wrap properly */
+            white-space: pre-wrap; /* Preserves line breaks and whitespace in the note */
+            border: 2px dashed red;
+            padding: 10px; /* Optional: Add padding for better readability */
+            box-sizing: border-box; /* Ensures padding is included in width */
 
            
         }
@@ -272,6 +278,7 @@
            
         }
 
+
         
     </style>
     <br><p></p>
@@ -279,19 +286,14 @@
 
 
     <h3>Note</h3>
-    
-    <div class="note">
-
+ 
+      <div class="note">
         {{ student_assesment_note.note }}
+      </div>
       
-       
-      
-     
-        
-    </div>
 
     <br><p>
-    <table border="0">
+    <table border="0" style="border: 1px solid #ffffff;">
     
         <tr>
             <td> 
